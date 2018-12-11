@@ -31,7 +31,6 @@ public class TimerSource {
             final String message = "The date is " + date + " and isn't it a bit scary?";
             this.log.info("SENDING " + message);
             return new GenericMessage<>(message);
-
         };
     }
 
