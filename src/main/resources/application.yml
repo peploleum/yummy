@@ -9,6 +9,7 @@ spring:
         input:
           binder: kafka
           destination: ner
+          source: ner
         output:
           binder: kafka
           destination: ner

@@ -28,7 +28,7 @@ public class TimerSource {
     public MessageSource<String> timerMessageSource() {
         return () -> {
             final String date = new SimpleDateFormat(this.format).format(new Date());
-            final String message = "Information," + date + ",Service Control Manager,7036,Aucun,Le service Expérience d’application est entré dans l’état : en cours d’exécution.";
+            final String message = "The date is " + date + " and isn't it a bit scary?";
             this.log.info("SENDING " + message);
             return new GenericMessage<>(message);
 

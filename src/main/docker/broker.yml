@@ -10,7 +10,7 @@ services:
     kafka:
         image: wurstmeister/kafka:latest
         environment:
-            KAFKA_ADVERTISED_HOST_NAME: 192.168.0.16
+            KAFKA_ADVERTISED_HOST_NAME: 10.247.202.195
             KAFKA_ADVERTISED_PORT: 8092
             KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
             KAFKA_CREATE_TOPICS: "ner:1:1"
