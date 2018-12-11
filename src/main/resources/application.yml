@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:8092
+          zk-nodes: localhost
+      bindings:
+        input:
+          binder: kafka
+          destination: ner
+        output:
+          binder: kafka
+          destination: ner
+format: dd/MM/YYYY hh:mm:ss
+fixed-delay: 3000
