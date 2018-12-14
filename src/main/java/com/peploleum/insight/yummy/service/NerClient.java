@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.NerJsonObjectQuery;
+import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.Rens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,8 @@ public class NerClient {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerMessage, headers);
 
-           // String url = "http://localhost:9999/opener";
-
             final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
+            NerJsonObjectResponse jsonResponse=mapperObj.readValue(tResponseEntity.toString(), NerJsonObjectResponse.class);
             log.info("Received " + tResponseEntity);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
