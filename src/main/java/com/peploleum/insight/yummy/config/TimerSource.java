@@ -1,7 +1,5 @@
 package com.peploleum.insight.yummy.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.peploleum.insight.yummy.dto.Rens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
