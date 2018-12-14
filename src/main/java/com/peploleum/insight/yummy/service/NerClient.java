@@ -26,19 +26,19 @@ public class NerClient {
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
 
-            NerJsonObjectQuery nerMessage=new NerJsonObjectQuery();
-            nerMessage.addsteps("identify_language,tokenize,pos,ner");
-            nerMessage.setText(message.getTitle().get(0));
-            final String dummyPayloadAsString = mapperObj.writeValueAsString(nerMessage);
+            NerJsonObjectQuery nerQuery=new NerJsonObjectQuery();
+            nerQuery.addsteps("identify_language,tokenize,pos,ner");
+            nerQuery.setText(message.getTitle().get(0));
+            final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
             log.info("Payload: " + dummyPayloadAsString);
             final RestTemplate rt = new RestTemplate();
             final HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-            final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerMessage, headers);
+            final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
 
             final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
-            NerJsonObjectResponse jsonResponse=mapperObj.readValue(tResponseEntity.toString(), NerJsonObjectResponse.class);
+            NerJsonObjectResponse jsonResponse=mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
             log.info("Received " + tResponseEntity);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
