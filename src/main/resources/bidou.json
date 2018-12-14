@@ -1,0 +1,128 @@
+{
+  "text"      : "PÃ©dophilie : le pape Ã©carte deux cardinaux de son cercle de conseillers ",
+  "language"  : "fr",
+  "terms"     : {
+    "t1":
+    {
+      "type"       :"open",
+      "lemma"      :"PÃ©dophilie",
+      "text"       :"PÃ©dophilie",
+      "pos"        :"G",
+      "morphofeat" :"Afs"
+    },
+    "t2":
+    {
+      "type"       :"close",
+      "lemma"      :":",
+      "text"       :":",
+      "pos"        :"O",
+      "morphofeat" :":"
+    },
+    "t3":
+    {
+      "type"       :"close",
+      "lemma"      :"le",
+      "text"       :"le",
+      "pos"        :"D",
+      "morphofeat" :"Dms"
+    },
+    "t4":
+    {
+      "type"       :"open",
+      "lemma"      :"pape",
+      "text"       :"pape",
+      "pos"        :"N",
+      "morphofeat" :"NCms"
+    },
+    "t5":
+    {
+      "type"       :"open",
+      "lemma"      :"Ã©carter",
+      "text"       :"Ã©carte",
+      "pos"        :"V",
+      "morphofeat" :"VP3s"
+    },
+    "t6":
+    {
+      "type"       :"close",
+      "lemma"      :"deux",
+      "text"       :"deux",
+      "pos"        :"D",
+      "morphofeat" :"Dmp"
+    },
+    "t7":
+    {
+      "type"       :"open",
+      "lemma"      :"cardinal",
+      "text"       :"cardinaux",
+      "pos"        :"N",
+      "morphofeat" :"NCmp"
+    },
+    "t8":
+    {
+      "type"       :"close",
+      "lemma"      :"de",
+      "text"       :"de",
+      "pos"        :"P",
+      "morphofeat" :"P"
+    },
+    "t9":
+    {
+      "type"       :"close",
+      "lemma"      :"son",
+      "text"       :"son",
+      "pos"        :"D",
+      "morphofeat" :"Dms"
+    },
+    "t10":
+    {
+      "type"       :"open",
+      "lemma"      :"cercle",
+      "text"       :"cercle",
+      "pos"        :"N",
+      "morphofeat" :"NCms"
+    },
+    "t11":
+    {
+      "type"       :"close",
+      "lemma"      :"de",
+      "text"       :"de",
+      "pos"        :"P",
+      "morphofeat" :"P"
+    },
+    "t12":
+    {
+      "type"       :"open",
+      "lemma"      :"conseiller",
+      "text"       :"conseillers",
+      "pos"        :"N",
+      "morphofeat" :"NCmp"
+    }},
+
+
+  "lp"        : [
+    {
+      "name"     :"opener-sentence-splitter-fr",
+      "timestamp":"2018-12-14T13:31:22Z",
+      "version"  :"0.0.1",
+      "layer"    :"text"
+    },
+    {
+      "name"     :"opener-tokenizer-fr",
+      "timestamp":"2018-12-14T13:31:22Z",
+      "version"  :"1.0.1",
+      "layer"    :"text"
+    },
+    {
+      "name"     :"ehu-pos-fr",
+      "timestamp":"2018-12-14T13:31:22+0000",
+      "version"  :"1.0",
+      "layer"    :"terms"
+    },
+    {
+      "name"     :"ixa-pipe-nerc-fr-default",
+      "timestamp":"2018-12-14T13:31:22+0000",
+      "version"  :"1.5.2",
+      "layer"    :"entities"
+    }]
+}

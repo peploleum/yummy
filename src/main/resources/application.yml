@@ -5,15 +5,15 @@ spring:
     stream:
       kafka:
         binder:
-          brokers: localhost:8092
+          brokers: 10.71.2.66:8092
           zk-nodes: localhost
       bindings:
         input:
           binder: kafka
-          destination: ner
-          source: ner
+          destination: topicjson
         output:
           binder: kafka
-          destination: ner
+          destination: topicjson
 format: dd/MM/YYYY hh:mm:ss
 fixed-delay: 3000
+urlner: http://localhost:9999/opener
