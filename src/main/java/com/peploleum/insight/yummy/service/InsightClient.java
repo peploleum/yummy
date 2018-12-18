@@ -45,12 +45,16 @@ public class InsightClient {
 
 
 
-    public void doSend(RawDataDTO dataRawDto,  String url)
+    public void doSend(RawDataDTO dataRawDto,  String url, String tokenHttp)
     {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        if (tokenHttp!=null)
+        {
+            headers.add("X-XSRF-TOKEN",tokenHttp);
+        }
         final HttpEntity<RawDataDTO> entity = new HttpEntity<>(dataRawDto, headers);
         final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
         log.info("Received " + tResponseEntity);

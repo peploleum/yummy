@@ -28,6 +28,9 @@ public class RawDataSink {
     @Value("${urlinsight}")
     private String urlinsight;
 
+    @Value("${token-http}")
+    private String tokenHttp;
+
     @Value("${format}")
     private String format;
 
@@ -42,7 +45,7 @@ public class RawDataSink {
         int cpt=0;
        for (RawDataDTO dataRaw:dataRawList
                 ) {
-           new InsightClient().doSend(dataRaw,urlinsight);
+           new InsightClient().doSend(dataRaw,urlinsight, tokenHttp);
            cpt++;
             }
 
