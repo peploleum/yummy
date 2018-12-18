@@ -30,6 +30,16 @@ public class NerJsonObjectResponse {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    private String content;
+
     @JsonProperty("text")
     public String getText() {
         return text;

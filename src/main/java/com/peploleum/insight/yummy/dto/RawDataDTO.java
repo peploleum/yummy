@@ -10,6 +10,7 @@ import java.util.Objects;
  */
 public class RawDataDTO implements Serializable {
 
+
     private String id;
 
     @NotNull
@@ -159,6 +160,7 @@ public class RawDataDTO implements Serializable {
     public void setRawDataAnnotations(String rawDataAnnotations) {
         this.rawDataAnnotations = rawDataAnnotations;
     }
+
 
     @Override
     public boolean equals(Object o) {

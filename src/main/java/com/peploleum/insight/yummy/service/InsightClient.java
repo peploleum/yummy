@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.DummyPayload;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
+import com.peploleum.insight.yummy.dto.RawDataDTO;
 import com.peploleum.insight.yummy.dto.Rens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +43,15 @@ public class InsightClient {
         }
     }
 
-    public void doSend(NerJsonObjectResponse nerResponse, String url)
+
+
+    public void doSend(RawDataDTO dataRawDto,  String url)
     {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        final HttpEntity<NerJsonObjectResponse> entity = new HttpEntity<>(nerResponse, headers);
+        final HttpEntity<RawDataDTO> entity = new HttpEntity<>(dataRawDto, headers);
         final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
         log.info("Received " + tResponseEntity);
     }
