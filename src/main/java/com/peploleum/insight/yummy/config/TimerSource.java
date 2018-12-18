@@ -17,14 +17,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Configuration
-@EnableBinding(Source.class)
+//@EnableBinding(Source.class)
 public class TimerSource {
     private final Logger log = LoggerFactory.getLogger(TimerSource.class);
 
     @Value("${format}")
     private String format;
 
-    @Bean
+  /*  @Bean
     @InboundChannelAdapter(value = Source.OUTPUT, poller = @Poller(fixedDelay = "${fixed-delay}", maxMessagesPerPoll = "1"))
     public MessageSource<String> timerMessageSource() {
         return () -> {
@@ -35,6 +35,6 @@ public class TimerSource {
 
             return new GenericMessage<>(message);
         };
-    }
+    }*/
 
 }
