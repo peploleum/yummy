@@ -22,25 +22,31 @@ public class NerClient {
 
     private final Logger log = LoggerFactory.getLogger(InsightClient.class);
 
-    public NerJsonObjectResponse doSend(Rens message, String url) {
+    public List<NerJsonObjectResponse> doSend(Rens message, String url) {
         ObjectMapper mapperObj = new ObjectMapper();
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        NerJsonObjectResponse jsonResponse=null;
+        List<NerJsonObjectResponse> jsonResponse=new ArrayList<>();
         try {
 
-            NerJsonObjectQuery nerQuery=new NerJsonObjectQuery();
-            nerQuery.addsteps("identify_language,tokenize,pos,ner");
-            nerQuery.setText(message.getTitle().get(1));
-            final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
-            log.info("Payload: " + dummyPayloadAsString);
-            final RestTemplate rt = new RestTemplate();
-            final HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-            final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
-            final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
-            jsonResponse=mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
-            log.info("Received " + tResponseEntity.getBody());
+            int cpt=0;
+            for (String title :message.getTitle()
+                 ) {
+                NerJsonObjectQuery nerQuery=new NerJsonObjectQuery();
+                nerQuery.addsteps("identify_language,tokenize,pos,ner");
+                nerQuery.setText(message.getTitle().get(cpt));
+                final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
+                log.info("Payload: " + dummyPayloadAsString);
+                final RestTemplate rt = new RestTemplate();
+                final HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
+                final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
+                jsonResponse.add(mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class));
+                log.info("Received " + tResponseEntity.getBody());
+                cpt++;
+            }
+
 
         } catch (IOException e) {
             log.error(e.getMessage(), e);

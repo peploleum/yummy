@@ -14,6 +14,7 @@ import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
+import java.util.List;
 
 @Configuration
 @EnableBinding(value = {Sink.class})
@@ -36,8 +37,12 @@ public class RawDataSink {
         Rens mess=mapperObj.readValue(message,Rens.class);
         final String display = "Received: " + message;
         log.info(display);
-        NerJsonObjectResponse jsonresponse=new NerClient().doSend(mess, urlner);
-       // new InsightClient().doSend(jsonresponse,urlinsight);
+        List<NerJsonObjectResponse> jsonresponseList=new NerClient().doSend(mess, urlner);
+            //for (NerJsonObjectResponse jsonresponse:jsonresponseList
+            //     ) {
+            //    new InsightClient().doSend(jsonresponse,urlinsight);
+            //}
+
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
