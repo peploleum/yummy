@@ -1,7 +1,9 @@
 package com.peploleum.insight.yummy.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.Rens;
+import com.peploleum.insight.yummy.service.InsightClient;
 import com.peploleum.insight.yummy.service.NerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,9 @@ public class RawDataSink {
     @Value("${urlner}")
     private String urlner;
 
+    @Value("${urlinsight}")
+    private String urlinsight;
+
     @Value("${format}")
     private String format;
 
@@ -31,8 +36,8 @@ public class RawDataSink {
         Rens mess=mapperObj.readValue(message,Rens.class);
         final String display = "Received: " + message;
         log.info(display);
-        new NerClient().doSend(mess, urlner);
-
+        NerJsonObjectResponse jsonresponse=new NerClient().doSend(mess, urlner);
+       // new InsightClient().doSend(jsonresponse,urlinsight);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
