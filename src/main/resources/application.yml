@@ -18,5 +18,3 @@ format: dd/MM/YYYY hh:mm:ss
 fixed-delay: 3000
 urlner: http://localhost:9999/opener
 urlinsight:  http://localhost:8080/api/raw-data
-urlautentification: http://localhost:8080/api/authentication
-token-http: 1f50b947-49c0-4bac-9c49-4b6e1fece756

@@ -25,7 +25,7 @@ public class NerClient {
 
     private final Logger log = LoggerFactory.getLogger(InsightClient.class);
 
-    public void doSend(Rens message, String urlner, String urlinsight, String tokenHttp) {
+    public void doSend(Rens message, String urlner, String urlinsight) {
         ObjectMapper mapperObj = new ObjectMapper();
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
@@ -61,7 +61,7 @@ public class NerClient {
     }
 
 
-    public void doSendOne(Rens message, String urlner, String urlinsight, String tokenHttp) {
+    public void doSendOne(Rens message, String urlner, String urlinsight) {
         ObjectMapper mapperObj = new ObjectMapper();
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         RawDataDTO dataRaw=null;
@@ -99,6 +99,7 @@ public class NerClient {
     {
 
         RawDataDTO dataRaw=new RawDataDTO();
+        log.info("RAW DATA NAME "+name);
         dataRaw.setRawDataName(name);
         dataRaw.setRawDataSourceName(SourceName);
         dataRaw.setRawDataSourceUri(SourceUri);

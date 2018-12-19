@@ -28,12 +28,6 @@ public class RawDataSink {
     @Value("${urlinsight}")
     private String urlinsight;
 
-    @Value("${token-http}")
-    private String tokenHttp;
-
-    @Value("${urlautentification}")
-    private String urlautentification;
-
     @Value("${format}")
     private String format;
 
@@ -44,8 +38,7 @@ public class RawDataSink {
         Rens mess=mapperObj.readValue(message,Rens.class);
         final String display = "Received: " + message;
         log.info(display);
-        new NerClient().doSend(mess, urlner,urlinsight, tokenHttp);
-        //new NerClient().doSendOne(mess, urlner,urlinsight, tokenHttp);
+        new NerClient().doSend(mess, urlner,urlinsight);
 
         } catch (IOException e) {
             log.error(e.getMessage(), e);
