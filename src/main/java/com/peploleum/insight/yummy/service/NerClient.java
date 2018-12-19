@@ -57,7 +57,7 @@ public class NerClient {
                 }
                 dto.setRawDataContent(nerCandidate);
                 dto.setRawDataAnnotations(nerObjectRespone.getContent());
-                dto.setRawDataType(nerObjectRespone.getLanguage());
+                dto.setRawDataDataContentType(nerObjectRespone.getLanguage());
                 new InsightPostman(urlinsight).sendRaw(dto);
                 log.info("Received " + tResponseEntity.getBody());
                 cpt++;

@@ -28,7 +28,7 @@ public class Channel {
     @JsonProperty("title")
     private String title;
     @JsonProperty("link")
-    private List<Link> link = null;
+    private List<Object> link = null;
     @JsonProperty("description")
     private String description;
     @JsonProperty("lastBuildDate")
@@ -57,12 +57,12 @@ public class Channel {
     }
 
     @JsonProperty("link")
-    public List<Link> getLink() {
+    public List<Object> getLink() {
         return link;
     }
 
     @JsonProperty("link")
-    public void setLink(List<Link> link) {
+    public void setLink(List<Object> link) {
         this.link = link;
     }
 
