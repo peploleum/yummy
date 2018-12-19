@@ -32,7 +32,8 @@ public class InsightPostman {
         }
         final HttpEntity<RawDataDTO> entity = new HttpEntity<>(dto, headers);
         final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
-        log.info("Received " + tResponseEntity);
+        log.info("url insight: "+url);
+        log.info("ReceivedInsight " + tResponseEntity);
     }
 
 

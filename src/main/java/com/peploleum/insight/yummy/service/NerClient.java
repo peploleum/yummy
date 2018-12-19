@@ -85,7 +85,7 @@ public class NerClient {
                 //dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
                 dataRaw=createDatarowNoDate(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt));
 
-                log.info("Received " + tResponseEntity.getBody());
+                log.info("ReceivedNER " + tResponseEntity.getBody());
                 new InsightPostman().sendRaw(dataRaw,urlinsight);
 
 
