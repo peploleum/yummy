@@ -7,6 +7,8 @@ import com.peploleum.insight.yummy.dto.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.RawDataDTO;
 import com.peploleum.insight.yummy.dto.SourceMessage;
+import com.peploleum.insight.yummy.dto.source.Item;
+import com.peploleum.insight.yummy.dto.source.RssSourceMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -21,17 +23,18 @@ public class NerClient {
 
     private final Logger log = LoggerFactory.getLogger(InsightClient.class);
 
-    public void doSend(SourceMessage message, String urlner, String urlinsight) {
+    public void doSend(RssSourceMessage message, String urlner, String urlinsight) {
         ObjectMapper mapperObj = new ObjectMapper();
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
 
             int cpt = 0;
-            for (String title : message.getTitle()
+            for (Item item : message.getChannel().getItem()
             ) {
                 NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
                 nerQuery.addsteps("identify_language,tokenize,pos,ner");
-                nerQuery.setText(message.getTitle().get(cpt));
+                final String nerCandidate = (item.getDescription() != null && !item.getDescription().isEmpty()) ? item.getDescription() : item.getTitle();
+                nerQuery.setText(nerCandidate);
                 final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
                 log.info("Payload: " + dummyPayloadAsString);
                 final RestTemplate rt = new RestTemplate();
@@ -43,8 +46,19 @@ public class NerClient {
                 NerJsonObjectResponse nerObjectRespone = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
                 nerObjectRespone.setContent(tResponseEntity.getBody());
                 //RawDataDTO dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
-                RawDataDTO dataRaw = createDatarowNoDate(nerObjectRespone, message.getTitle().get(cpt), message.getSoureData(), message.getLink().get(cpt));
-                new InsightPostman(urlinsight).sendRaw(dataRaw);
+                RawDataDTO dto = new RawDataDTO();
+                dto.setRawDataName(message.getChannel().getTitle());
+                dto.setRawDataCreationDate(LocalDate.now());
+                dto.setRawDataType("RSS");
+                try {
+                    dto.setRawDataSourceUri(message.getChannel().getLink().get(0).toString());
+                } catch (Exception e) {
+                    // nothing
+                }
+                dto.setRawDataContent(nerCandidate);
+                dto.setRawDataAnnotations(nerObjectRespone.getContent());
+                dto.setRawDataType(nerObjectRespone.getLanguage());
+                new InsightPostman(urlinsight).sendRaw(dto);
                 log.info("Received " + tResponseEntity.getBody());
                 cpt++;
             }

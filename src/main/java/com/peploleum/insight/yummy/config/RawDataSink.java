@@ -2,6 +2,7 @@ package com.peploleum.insight.yummy.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.SourceMessage;
+import com.peploleum.insight.yummy.dto.source.RssSourceMessage;
 import com.peploleum.insight.yummy.service.NerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class RawDataSink {
     public void handle(String message) {
         try {
             ObjectMapper mapperObj = new ObjectMapper();
-            SourceMessage mess = mapperObj.readValue(message, SourceMessage.class);
+            RssSourceMessage mess = mapperObj.readValue(message, RssSourceMessage.class);
             final String display = "Received: " + message;
             log.info(display);
             new NerClient().doSend(mess, urlner, urlinsight);

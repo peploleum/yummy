@@ -1,0 +1,233 @@
+{
+  "channel": {
+    "title": "World | Boston.com",
+    "link": [
+      {
+        "href": "https://www.boston.com/tag/world-news/feed",
+        "rel": "self",
+        "type": "application/rss+xml"
+      },
+      "https://www.boston.com"
+    ],
+    "description": "Boston.com",
+    "lastBuildDate": "Wed, 19 Dec 2018 13:16:18 +0000",
+    "language": "en-US",
+    "updatePeriod": "hourly",
+    "updateFrequency": 1,
+    "image": {
+      "url": "https://www.boston.com/wp-content/uploads/2016/08/cropped-Bug-Logo@2x-32x32.png",
+      "title": "World | Boston.com",
+      "link": "https://www.boston.com",
+      "width": 32,
+      "height": 32
+    },
+    "item": [
+      {
+        "title": "A Berklee alum was crowned Miss Universe 2018",
+        "link": "https://www.boston.com/culture/celebs/2018/12/17/a-berklee-alum-was-crowned-miss-universe-2018",
+        "pubDate": "Mon, 17 Dec 2018 21:54:31 +0000",
+        "creator": "Kevin Slane",
+        "category": [
+          "Culture",
+          "Celebs",
+          "Education",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=11100313"
+        },
+        "description": "Catriona Gray studied music theory, ear training, and harmony through the college.",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/catriona-gray-miss-universe-philippines-850x638.jpeg"
+        }
+      },
+      {
+        "title": "42 people were injured in a restaurant explosion in Japan",
+        "link": "https://www.boston.com/news/world-news/2018/12/16/42-people-were-injured-in-a-restaurant-explosion-in-japan",
+        "pubDate": "Sun, 16 Dec 2018 15:53:38 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=11086981"
+        },
+        "description": "Japanese police say 42 people have been injured in an explosion at a restaurant in northern Japan",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/Japan_Explosion_19898-850x638.jpg"
+        }
+      },
+      {
+        "title": "1 dead, 44 injured in Switzerland bus crash",
+        "link": "https://www.boston.com/news/world-news/2018/12/16/1-dead-44-injured-in-switzerland-bus-crash",
+        "pubDate": "Sun, 16 Dec 2018 15:46:32 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "Transportation",
+          "Weather",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=11086287"
+        },
+        "description": "Zurich police say a tour bus on its way to Germany has crashed in Switzerland, killing one person and injuring 44 others",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/Switzerland_Accident_52830-850x638.jpg"
+        }
+      },
+      {
+        "title": "Egypt announces discovery of 4,400-year-old tomb",
+        "link": "https://www.boston.com/news/world-news/2018/12/15/egypt-announces-discovery-of-4400-year-old-tomb",
+        "pubDate": "Sat, 15 Dec 2018 14:28:06 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=11078072"
+        },
+        "description": "Egypt has announced the discovery of a private tomb belonging to a senior official from the 5th dynasty of the pharaohs, which ruled roughly 4,400 years ago",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/Egypt_Antiquities_59466-850x638.jpg"
+        }
+      },
+      {
+        "title": "An American musician was killed while studying in the Netherlands",
+        "link": "https://www.boston.com/news/crime/2018/12/14/sarah-papenheim-netherlands",
+        "pubDate": "Fri, 14 Dec 2018 23:16:55 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "Crime",
+          "National",
+          "Trending",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=11064829"
+        },
+        "description": "Sarah Papenheim, a Minnesota native, was fatally stabbed Wednesday at her home in an apartment building near Erasmus University.",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/fa1ca06e5e424c2891b01ab9dd06cd4a-fa1ca06e5e424c2891b01ab9dd06cd4a-0-850x638.jpg"
+        }
+      },
+      {
+        "title": "Plant a tree: Milan's ambitious plans to be cleaner, greener",
+        "link": "https://www.boston.com/news/world-news/2018/12/09/plant-a-tree-milans-ambitious-plans-to-be-cleaner-greener",
+        "pubDate": "Sun, 09 Dec 2018 12:40:03 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "Business",
+          "Climate Change",
+          "Environment",
+          "Health",
+          "Travel",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=11000824"
+        },
+        "description": "The color for Italy's fashion capital now is gray _ due to its stone buildings and polluted skies _ but Milan is embarking on a new plan to go green, planting 3 million new trees by 2030",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/Italy_Climate_Greener_Milan_80194-850x638.jpg"
+        }
+      },
+      {
+        "title": "Rioting engulfs Paris as anger grows over high French taxes",
+        "link": "https://www.boston.com/news/world-news/2018/12/08/rioting-engulfs-paris-as-anger-grows-over-high-french-taxes",
+        "pubDate": "Sat, 08 Dec 2018 23:41:20 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=10992853"
+        },
+        "description": "An estimated 125,000 people demonstrated around France.",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/APTOPIX_France_Protests_50049-850x638.jpg"
+        }
+      },
+      {
+        "title": "Battle of wills: Tiny order of French nuns takes on Vatican",
+        "link": "https://www.boston.com/news/world-news/2018/12/08/battle-of-wills-tiny-order-of-french-nuns-takes-on-vatican",
+        "pubDate": "Sat, 08 Dec 2018 14:35:48 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "Lifestyle",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=10993887"
+        },
+        "description": "The Vatican is locked in a battle of wills with nuns in a tiny French religious order who are threatening to renounce their vows rather than accept the Holy See's decision to remove their superior",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/Vatican_French_Sisters_67554-850x638.jpg"
+        }
+      },
+      {
+        "title": "Rap concert stampede in Italy leaves 6 dead, over 50 hurt",
+        "link": "https://www.boston.com/news/world-news/2018/12/08/rap-concert-stampede-in-italy-leaves-6-dead-over-50-hurt",
+        "pubDate": "Sat, 08 Dec 2018 14:08:40 +0000",
+        "creator": "Associated Press",
+        "category": [
+          "News",
+          "Music",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=10992448"
+        },
+        "description": "Italian police say a stampede at a rap concert in an overcrowded disco killed five young teenagers early Saturday along with a woman who had brought her daughter to the event",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/Italy_Nightclub_Stampede_72324-850x638.jpg"
+        }
+      },
+      {
+        "title": "Meet Esther, the Canadian poster pig for meatless diets, animal rights, and diversity",
+        "link": "https://www.boston.com/culture/animals/2018/12/05/meet-esther-the-canadian-poster-pig-for-meatless-diets-animal-rights-and-diversity",
+        "pubDate": "Wed, 05 Dec 2018 05:00:00 +0000",
+        "creator": "The Boston Globe",
+        "category": [
+          "Culture",
+          "Animals",
+          "Media",
+          "World"
+        ],
+        "guid": {
+          "isPermaLink": false,
+          "$": "https://www.boston.com/?p=10946024"
+        },
+        "description": "The 600-pound pig has 10 social media accounts and more than 2 million followers in 43 countries.",
+        "enclosure": {
+          "type": "image/jpeg",
+          "url": "https://www.boston.com/wp-content/uploads/2018/12/esther-lead-850x638.jpeg"
+        }
+      }
+    ]
+  }
+}
