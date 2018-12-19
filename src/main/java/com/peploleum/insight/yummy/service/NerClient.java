@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.RawDataDTO;
-import com.peploleum.insight.yummy.dto.Rens;
+import com.peploleum.insight.yummy.dto.SourceMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -25,7 +24,7 @@ public class NerClient {
 
     private final Logger log = LoggerFactory.getLogger(InsightClient.class);
 
-    public void doSend(Rens message, String urlner, String urlinsight) {
+    public void doSend(SourceMessage message, String urlner, String urlinsight) {
         ObjectMapper mapperObj = new ObjectMapper();
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
@@ -61,7 +60,7 @@ public class NerClient {
     }
 
 
-    public void doSendOne(Rens message, String urlner, String urlinsight) {
+    public void doSendOne(SourceMessage message, String urlner, String urlinsight) {
         ObjectMapper mapperObj = new ObjectMapper();
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         RawDataDTO dataRaw=null;

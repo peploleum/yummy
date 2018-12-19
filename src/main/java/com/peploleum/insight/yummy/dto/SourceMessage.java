@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "dateTraiment",
         "title"
 })
-public class Rens {
+public class SourceMessage {
 
     @JsonProperty("@version")
     private String version;
