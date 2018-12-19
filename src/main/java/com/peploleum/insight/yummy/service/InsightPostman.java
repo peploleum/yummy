@@ -111,6 +111,17 @@ public class InsightPostman {
         return null;
     }
 
+    public void sendRaw( RawDataDTO dto, String urldataraw) {
+
+        final InsightPostman insightPostman = new InsightPostman();
+        final String accountCookie = insightPostman.account();
+        if (accountCookie == null)
+            return;
+        final List<String> cookies = insightPostman.authent(accountCookie);
+        if (cookies == null)
+            return;
+        insightPostman.doSend(dto, cookies, urldataraw);
+    }
 
     public static void main(String[] args) {
 

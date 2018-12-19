@@ -46,8 +46,9 @@ public class NerClient {
                 final ResponseEntity<String> tResponseEntity = rt.exchange(urlner, HttpMethod.POST, entity, String.class);
                 NerJsonObjectResponse nerObjectRespone=mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
                 nerObjectRespone.setContent(tResponseEntity.getBody());
-                RawDataDTO dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
-                new InsightClient().doSend(dataRaw,urlinsight, tokenHttp);
+                //RawDataDTO dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
+                RawDataDTO dataRaw=createDatarowNoDate(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt));
+                new InsightPostman().sendRaw(dataRaw,urlinsight);
                 log.info("Received " + tResponseEntity.getBody());
                 cpt++;
             }
@@ -85,7 +86,7 @@ public class NerClient {
                 dataRaw=createDatarowNoDate(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt));
 
                 log.info("Received " + tResponseEntity.getBody());
-                new InsightClient().doSend(dataRaw,urlinsight, tokenHttp);
+                new InsightPostman().sendRaw(dataRaw,urlinsight);
 
 
         } catch (IOException e) {
@@ -111,7 +112,6 @@ public class NerClient {
     public RawDataDTO createDatarow(NerJsonObjectResponse nerResponse, String name, String SourceName, String SourceUri, String dateTraiment)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
-
         //convert String to LocalDate
         LocalDate localDateTraitement = LocalDate.parse(dateTraiment, formatter);
 

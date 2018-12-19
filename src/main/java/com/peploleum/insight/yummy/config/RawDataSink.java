@@ -44,8 +44,8 @@ public class RawDataSink {
         Rens mess=mapperObj.readValue(message,Rens.class);
         final String display = "Received: " + message;
         log.info(display);
-        //new NerClient().doSend(mess, urlner,urlinsight, tokenHttp);
-        new NerClient().doSendOne(mess, urlner,urlinsight, tokenHttp);
+        new NerClient().doSend(mess, urlner,urlinsight, tokenHttp);
+        //new NerClient().doSendOne(mess, urlner,urlinsight, tokenHttp);
 
         } catch (IOException e) {
             log.error(e.getMessage(), e);
