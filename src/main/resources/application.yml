@@ -17,4 +17,5 @@ spring:
 format: dd/MM/YYYY hh:mm:ss
 fixed-delay: 3000
 urlner: http://localhost:9999/opener
-urlinsight:  http://localhost:8080/api/raw-data
+urlinsight:  http://localhost:8080/api/
+ner:  false

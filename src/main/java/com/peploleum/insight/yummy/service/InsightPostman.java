@@ -19,9 +19,13 @@ import java.util.regex.Pattern;
 
 public class InsightPostman {
     private final Logger log = LoggerFactory.getLogger(InsightPostman.class);
+    private String INSIGHT_APP_API_URI;
 
+    public InsightPostman(final String insightAppUrl) {
+        this.INSIGHT_APP_API_URI = insightAppUrl;
+    }
 
-    public void doSend(RawDataDTO dto, List<String> cookies, String url) {
+    public void doSend(RawDataDTO dto, List<String> cookies) {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -31,9 +35,8 @@ public class InsightPostman {
             headers.add("Cookie", cookie);
         }
         final HttpEntity<RawDataDTO> entity = new HttpEntity<>(dto, headers);
-        final ResponseEntity<String> tResponseEntity = rt.exchange(url, HttpMethod.POST, entity, String.class);
-        log.info("url insight: "+url);
-        log.info("ReceivedInsight " + tResponseEntity);
+        final ResponseEntity<String> tResponseEntity = rt.exchange(this.INSIGHT_APP_API_URI + "raw-data", HttpMethod.POST, entity, String.class);
+        log.info("Received " + tResponseEntity);
     }
 
 
@@ -44,7 +47,7 @@ public class InsightPostman {
         final HttpEntity<String> entity = new HttpEntity<>(headers);
         final ResponseEntity<String> forEntity;
         try {
-            forEntity = rt.exchange("http://localhost:8080/api/account", HttpMethod.GET, entity, String.class);
+            forEntity = rt.exchange(INSIGHT_APP_API_URI + "account", HttpMethod.GET, entity, String.class);
             log.info("Received " + forEntity);
 
         } catch (RestClientException e) {
@@ -72,7 +75,7 @@ public class InsightPostman {
         headers.add("Cookie", "XSRF-TOKEN=" + accountCookie);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         try {
-            final ResponseEntity<String> exchange = rt.exchange("http://localhost:8080/api/authentication", HttpMethod.POST, request, String.class);
+            final ResponseEntity<String> exchange = rt.exchange(INSIGHT_APP_API_URI + "authentication", HttpMethod.POST, request, String.class);
             final List<String> cookies = exchange.getHeaders().get("Set-Cookie");
             final String xsrfValue = extractXsrf(cookies);
             final String jessionId = extractJessionId(cookies);
@@ -112,31 +115,22 @@ public class InsightPostman {
         return null;
     }
 
-    public void sendRaw( RawDataDTO dto, String urldataraw) {
-
-        final InsightPostman insightPostman = new InsightPostman();
-        final String accountCookie = insightPostman.account();
+    public void sendRaw(RawDataDTO dto) {
+        final String accountCookie = this.account();
         if (accountCookie == null)
             return;
-        final List<String> cookies = insightPostman.authent(accountCookie);
+        final List<String> cookies = this.authent(accountCookie);
         if (cookies == null)
             return;
-        insightPostman.doSend(dto, cookies, urldataraw);
+        this.doSend(dto, cookies);
     }
 
     public static void main(String[] args) {
-
-        final InsightPostman insightPostman = new InsightPostman();
-        final String accountCookie = insightPostman.account();
-        if (accountCookie == null)
-            return;
-        final List<String> cookies = insightPostman.authent(accountCookie);
-        if (cookies == null)
-            return;
+        final InsightPostman insightPostman = new InsightPostman("http://localhost:8080/api/");
         RawDataDTO dto = new RawDataDTO();
         dto.setRawDataContent(UUID.randomUUID().toString());
         dto.setRawDataCreationDate(LocalDate.now());
         dto.setRawDataName(UUID.randomUUID().toString());
-        insightPostman.doSend(dto, cookies, "http://localhost:8080/api/raw-data");
+        insightPostman.sendRaw(dto);
     }
 }
