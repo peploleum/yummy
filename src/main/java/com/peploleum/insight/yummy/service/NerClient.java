@@ -15,11 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
 
-/**
- * Created by cpoullot on 14/12/2018.
- */
 public class NerClient {
 
     private final Logger log = LoggerFactory.getLogger(InsightClient.class);
@@ -29,10 +26,10 @@ public class NerClient {
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
 
-            int cpt=0;
-            for (String title :message.getTitle()
-                 ) {
-                NerJsonObjectQuery nerQuery=new NerJsonObjectQuery();
+            int cpt = 0;
+            for (String title : message.getTitle()
+            ) {
+                NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
                 nerQuery.addsteps("identify_language,tokenize,pos,ner");
                 nerQuery.setText(message.getTitle().get(cpt));
                 final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
@@ -43,11 +40,11 @@ public class NerClient {
                 headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
                 final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
                 final ResponseEntity<String> tResponseEntity = rt.exchange(urlner, HttpMethod.POST, entity, String.class);
-                NerJsonObjectResponse nerObjectRespone=mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
+                NerJsonObjectResponse nerObjectRespone = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
                 nerObjectRespone.setContent(tResponseEntity.getBody());
                 //RawDataDTO dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
-                RawDataDTO dataRaw=createDatarowNoDate(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt));
-                new InsightPostman().sendRaw(dataRaw,urlinsight);
+                RawDataDTO dataRaw = createDatarowNoDate(nerObjectRespone, message.getTitle().get(cpt), message.getSoureData(), message.getLink().get(cpt));
+                new InsightPostman(urlinsight).sendRaw(dataRaw);
                 log.info("Received " + tResponseEntity.getBody());
                 cpt++;
             }
@@ -63,29 +60,29 @@ public class NerClient {
     public void doSendOne(SourceMessage message, String urlner, String urlinsight) {
         ObjectMapper mapperObj = new ObjectMapper();
         mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        RawDataDTO dataRaw=null;
+        RawDataDTO dataRaw = null;
         try {
 
-            int cpt=0;
+            int cpt = 0;
 
-                NerJsonObjectQuery nerQuery=new NerJsonObjectQuery();
-                nerQuery.addsteps("identify_language,tokenize,pos,ner");
-                nerQuery.setText(message.getTitle().get(cpt));
-                final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
-                log.info("Payload: " + dummyPayloadAsString);
-                final RestTemplate rt = new RestTemplate();
-                final HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-                final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
-                final ResponseEntity<String> tResponseEntity = rt.exchange(urlner, HttpMethod.POST, entity, String.class);
-                NerJsonObjectResponse nerObjectRespone=mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
-                nerObjectRespone.setContent(tResponseEntity.getBody());
-                //dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
-                dataRaw=createDatarowNoDate(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt));
+            NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
+            nerQuery.addsteps("identify_language,tokenize,pos,ner");
+            nerQuery.setText(message.getTitle().get(cpt));
+            final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
+            log.info("Payload: " + dummyPayloadAsString);
+            final RestTemplate rt = new RestTemplate();
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
+            final ResponseEntity<String> tResponseEntity = rt.exchange(urlner, HttpMethod.POST, entity, String.class);
+            NerJsonObjectResponse nerObjectRespone = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
+            nerObjectRespone.setContent(tResponseEntity.getBody());
+            //dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
+            dataRaw = createDatarowNoDate(nerObjectRespone, message.getTitle().get(cpt), message.getSoureData(), message.getLink().get(cpt));
 
-                log.info("Received " + tResponseEntity.getBody());
-                new InsightPostman().sendRaw(dataRaw,urlinsight);
+            log.info("Received " + tResponseEntity.getBody());
+            new InsightPostman(urlinsight).sendRaw(dataRaw);
 
 
         } catch (IOException e) {
@@ -94,11 +91,10 @@ public class NerClient {
     }
 
 
-    public RawDataDTO createDatarowNoDate(NerJsonObjectResponse nerResponse, String name, String SourceName, String SourceUri)
-    {
+    public RawDataDTO createDatarowNoDate(NerJsonObjectResponse nerResponse, String name, String SourceName, String SourceUri) {
 
-        RawDataDTO dataRaw=new RawDataDTO();
-        log.info("RAW DATA NAME "+name);
+        RawDataDTO dataRaw = new RawDataDTO();
+        log.info("RAW DATA NAME " + name);
         dataRaw.setRawDataName(name);
         dataRaw.setRawDataSourceName(SourceName);
         dataRaw.setRawDataSourceUri(SourceUri);
@@ -109,13 +105,12 @@ public class NerClient {
         return dataRaw;
     }
 
-    public RawDataDTO createDatarow(NerJsonObjectResponse nerResponse, String name, String SourceName, String SourceUri, String dateTraiment)
-    {
+    public RawDataDTO createDatarow(NerJsonObjectResponse nerResponse, String name, String SourceName, String SourceUri, String dateTraiment) {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
         //convert String to LocalDate
         LocalDate localDateTraitement = LocalDate.parse(dateTraiment, formatter);
 
-        RawDataDTO dataRaw=new RawDataDTO();
+        RawDataDTO dataRaw = new RawDataDTO();
         dataRaw.setRawDataName(name);
         dataRaw.setRawDataSourceName(SourceName);
         dataRaw.setRawDataSourceUri(SourceUri);
