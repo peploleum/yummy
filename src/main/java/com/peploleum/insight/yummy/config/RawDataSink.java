@@ -31,14 +31,24 @@ public class RawDataSink {
     @Value("${ner}")
     private boolean ner;
 
+    @Value("${mock}")
+    private boolean mock;
+
     @StreamListener(Sink.INPUT)
     public void handle(String message) {
         try {
             ObjectMapper mapperObj = new ObjectMapper();
-            RssSourceMessage mess = mapperObj.readValue(message, RssSourceMessage.class);
-            final String display = "Received: " + message;
-            log.info(display);
-            new NerClient().doSend(mess, urlner, urlinsight, ner);
+            if (mock) {
+                SourceMessage mess = mapperObj.readValue(message, SourceMessage.class);
+                final String display = "Received: " + message;
+                log.info(display);
+                new NerClient().doSendSourceMessage(mess, urlner, urlinsight, ner);
+            } else {
+                RssSourceMessage mess = mapperObj.readValue(message, RssSourceMessage.class);
+                final String display = "Received: " + message;
+                log.info(display);
+                new NerClient().doSend(mess, urlner, urlinsight, ner);
+            }
 
         } catch (IOException e) {
             log.error(e.getMessage(), e);

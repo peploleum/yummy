@@ -35,8 +35,13 @@ public class InsightPostman {
             headers.add("Cookie", cookie);
         }
         final HttpEntity<RawDataDTO> entity = new HttpEntity<>(dto, headers);
-        final ResponseEntity<String> tResponseEntity = rt.exchange(this.INSIGHT_APP_API_URI + "raw-data", HttpMethod.POST, entity, String.class);
-        log.info("Received " + tResponseEntity);
+        final ResponseEntity<String> tResponseEntity;
+        try {
+            tResponseEntity = rt.exchange(this.INSIGHT_APP_API_URI + "raw-data", HttpMethod.POST, entity, String.class);
+            log.info("Received " + tResponseEntity);
+        } catch (RestClientException e) {
+            this.log.error(e.getMessage(), e);
+        }
     }
 
 
@@ -116,12 +121,17 @@ public class InsightPostman {
     }
 
     public void sendRaw(RawDataDTO dto) {
+        this.log.info("Sending Raw data");
+
         final String accountCookie = this.account();
         if (accountCookie == null)
             return;
+        this.log.info("account cookie received");
         final List<String> cookies = this.authent(accountCookie);
-        if (cookies == null)
+        if (cookies == null) {
             return;
+        }
+        this.log.info("session cookie received");
         this.doSend(dto, cookies);
     }
 

@@ -30,7 +30,7 @@ public class NerClient {
 
             int cpt = 0;
             for (Item item : message.getChannel().getItem()
-            ) {
+                    ) {
                 NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
                 nerQuery.addsteps("identify_language,tokenize,pos,ner");
                 final String nerCandidate = (item.getDescription() != null && !item.getDescription().isEmpty()) ? item.getDescription() : item.getTitle();
@@ -65,6 +65,50 @@ public class NerClient {
                     dto.setRawDataDataContentType(nerObjectRespone.getLanguage());
                 }
                 new InsightPostman(urlinsight).sendRaw(dto);
+
+                cpt++;
+            }
+
+
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+    }
+
+    public void doSendSourceMessage(SourceMessage message, String urlner, String urlinsight, final boolean useNer) {
+        ObjectMapper mapperObj = new ObjectMapper();
+        mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        try {
+
+            int cpt = 0;
+            for (String item : message.getTitle()
+                    ) {
+                NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
+                nerQuery.addsteps("identify_language,tokenize,pos,ner");
+                final String nerCandidate = message.getTitle().get(cpt);
+                nerQuery.setText(nerCandidate);
+                NerJsonObjectResponse nerObjectRespone = null;
+                RawDataDTO dto = null;
+                if (useNer) {
+                    final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
+                    log.info("Payload: " + dummyPayloadAsString);
+                    final RestTemplate rt = new RestTemplate();
+                    final HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                    headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                    final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
+                    final ResponseEntity<String> tResponseEntity = rt.exchange(urlner, HttpMethod.POST, entity, String.class);
+                    nerObjectRespone = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
+                    nerObjectRespone.setContent(tResponseEntity.getBody());
+                    //RawDataDTO dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
+                    dto = createDatarowNoDate(nerObjectRespone, message.getTitle().get(cpt), message.getSoureData(), message.getLink().get(cpt));
+                    log.info("Received " + tResponseEntity.getBody());
+                }
+
+                if (dto != null) {
+                    new InsightPostman(urlinsight).sendRaw(dto);
+                }
 
                 cpt++;
             }
