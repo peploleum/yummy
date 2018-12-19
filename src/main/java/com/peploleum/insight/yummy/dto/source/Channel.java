@@ -1,34 +1,30 @@
 
 package com.peploleum.insight.yummy.dto.source;
 
+import com.fasterxml.jackson.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "title",
-    "link",
-    "description",
-    "lastBuildDate",
-    "language",
-    "updatePeriod",
-    "updateFrequency",
-    "image",
-    "item"
+        "title",
+        "link",
+        "description",
+        "lastBuildDate",
+        "language",
+        "updatePeriod",
+        "updateFrequency",
+        "image",
+        "item"
 })
 public class Channel {
 
     @JsonProperty("title")
     private String title;
     @JsonProperty("link")
-    private List<Object> link = null;
+    private Object link = null;
     @JsonProperty("description")
     private String description;
     @JsonProperty("lastBuildDate")
@@ -57,12 +53,12 @@ public class Channel {
     }
 
     @JsonProperty("link")
-    public List<Object> getLink() {
+    public Object getLink() {
         return link;
     }
 
     @JsonProperty("link")
-    public void setLink(List<Object> link) {
+    public void setLink(Object link) {
         this.link = link;
     }
 
