@@ -59,6 +59,9 @@ public class NerClient {
                     if (message.getChannel().getLink() instanceof ArrayList) {
                         dto.setRawDataSourceUri(((ArrayList) message.getChannel().getLink()).get(0).toString());
                     }
+                    if (message.getChannel().getLink() instanceof String) {
+                        dto.setRawDataSourceUri((String) message.getChannel().getLink());
+                    }
                 } catch (Exception e) {
                     // nothing
                 }
