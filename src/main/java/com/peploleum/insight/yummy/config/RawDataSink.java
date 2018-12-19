@@ -28,6 +28,9 @@ public class RawDataSink {
     @Value("${format}")
     private String format;
 
+    @Value("${ner}")
+    private boolean ner;
+
     @StreamListener(Sink.INPUT)
     public void handle(String message) {
         try {
@@ -35,7 +38,7 @@ public class RawDataSink {
             RssSourceMessage mess = mapperObj.readValue(message, RssSourceMessage.class);
             final String display = "Received: " + message;
             log.info(display);
-            new NerClient().doSend(mess, urlner, urlinsight);
+            new NerClient().doSend(mess, urlner, urlinsight, ner);
 
         } catch (IOException e) {
             log.error(e.getMessage(), e);
