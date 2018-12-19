@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class NerClient {
@@ -30,7 +31,7 @@ public class NerClient {
 
             int cpt = 0;
             for (Item item : message.getChannel().getItem()
-                    ) {
+            ) {
                 NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
                 nerQuery.addsteps("identify_language,tokenize,pos,ner");
                 final String nerCandidate = (item.getDescription() != null && !item.getDescription().isEmpty()) ? item.getDescription() : item.getTitle();
@@ -55,7 +56,9 @@ public class NerClient {
                 dto.setRawDataCreationDate(LocalDate.now());
                 dto.setRawDataType("RSS");
                 try {
-                    dto.setRawDataSourceUri(message.getChannel().getLink().get(0).toString());
+                    if (message.getChannel().getLink() instanceof ArrayList) {
+                        dto.setRawDataSourceUri(((ArrayList) message.getChannel().getLink()).get(0).toString());
+                    }
                 } catch (Exception e) {
                     // nothing
                 }
@@ -83,7 +86,7 @@ public class NerClient {
 
             int cpt = 0;
             for (String item : message.getTitle()
-                    ) {
+            ) {
                 NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
                 nerQuery.addsteps("identify_language,tokenize,pos,ner");
                 final String nerCandidate = message.getTitle().get(cpt);
