@@ -1,21 +1,21 @@
 version: '3'
 services:
     logstash:
-        container_name: logstashner
+        container_name: logstash
         build:
-            context: ./logstash/
-            args:
+          context: ./logstash/
+          args:
               ELK_VERSION: 6.4.2
         volumes:
-            - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-            - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+           - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+           - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
         ports:
-            - "5000:5000"
-            - "9600:9600"
+           - "5000:5000"
+           - "9600:9600"
         environment:
-                LS_JAVA_OPTS: "-Xmx2048m -Xms256m"
+          LS_JAVA_OPTS: "-Xmx2048m -Xms256m"
         networks:
-           - insight
+        - insight
     nifi:
         image: apache/nifi:latest
         container_name: nifi
@@ -30,9 +30,9 @@ services:
         image: wurstmeister/zookeeper:latest
         container_name: zookeeper
         ports:
-          - 2181:2181
+        - 2181:2181
         networks:
-          - insight
+        - insight
     kafka:
         image: wurstmeister/kafka:latest
         environment:
