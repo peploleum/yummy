@@ -31,21 +31,7 @@ public class TimerSource {
     @InboundChannelAdapter(value = Source.OUTPUT, poller = @Poller(fixedDelay = "${fixed-delay}", maxMessagesPerPoll = "1"))
     public MessageSource<String> timerMessageSource() {
         return () -> {
-            final ObjectMapper om = new ObjectMapper();
-            String val = "";
-            try {
-                InputStream i=TimerSource.class.getResourceAsStream("/exemple.txt");
-                BufferedReader r = new BufferedReader(new InputStreamReader(i));
-
-                // reads each line
-                String l;
-                while((l = r.readLine()) != null) {
-                    val = val + l;
-                }
-                i.close();
-
-                this.log.info("SENDING " + val);
-                return new GenericMessage<>(val);
+                final ObjectMapper om = new ObjectMapper();
 
                // final RssSourceMessage rssSourceMessage = om.readValue(TimerSource.class.getResourceAsStream("/sample.json"), RssSourceMessage.class);
                // final String message = om.writeValueAsString(rssSourceMessage);
