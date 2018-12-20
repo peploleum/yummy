@@ -1,0 +1,126 @@
+version: '3'
+services:
+    insight-app:
+        image: 192.168.65.5:8093/insight:latest
+        environment:
+            - _JAVA_OPTIONS=-Xmx512m -Xms256m
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_DATA_MONGODB_URI=mongodb://insight-mongodb:27017
+            - SPRING_DATA_MONGODB_DATABASE=insight
+            - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+            - SPRING_DATA_JEST_URI=http://insight-elasticsearch:9200
+            - APPLICATION_KIBANA_URI=http://kibana:5601/
+        ports:
+            - 8080:8080
+        networks:
+          - insight
+    insight-mongodb:
+        image: 192.168.65.5:8093/mongo:4.0.2
+        ports:
+            - "27017:27017"
+        networks:
+          - insight
+    insight-elasticsearch:
+        image: 192.168.65.5:8093/elasticsearch:6.4.2
+        container_name: elasticsearch
+        environment:
+        - network.host=0.0.0.0
+        - discovery.type=single-node
+        - cluster.name=insight
+        ports:
+        - 9200:9200
+        - 9300:9300
+        networks:
+          - insight
+    kibana:
+            image: 192.168.65.5:8093/kibana:6.4.2
+            container_name: kibana
+            ports:
+             - "5601:5601"
+            environment:
+             - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+            networks:
+              - insight
+    nifi:
+        image:  192.168.65.5:8093/apache/nifi:latest
+        container_name: nifi
+        ports:
+          - "8090:8080"
+        volumes:
+           - ./feeder/templates/:/opt/nifi/nifi-current/conf/templates/
+           - ./feeder/config/:/opt/nifi/nifi-current/config/
+           - ./feeder/xml/:/opt/nifi/nifi-current/xml/
+        networks:
+        - insight
+    zookeeper:
+        image: 192.168.65.5:8093/wurstmeister/zookeeper:latest
+        container_name: zookeeper
+        ports:
+        - 2181:2181
+        networks:
+        - insight
+    kafka:
+        image: 192.168.65.5:8093/wurstmeister/kafka:latest
+        environment:
+           KAFKA_ADVERTISED_HOST_NAME: 192.168.65.0
+           KAFKA_ADVERTISED_PORT: 8092
+           KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+           KAFKA_CREATE_TOPICS: "topicrss:1:1,topicjson:1:1"
+        ports:
+          - 8092:9092
+        networks:
+         - insight
+    wrapper:
+        image: 192.168.65.5:8093/cwolff/opener-docker-wrapper
+        build:
+            context: ./wrapper
+        environment:
+            SANIC_OPENER_IDENTIFY_LANGUAGE_URL: http://language_identifier
+            SANIC_OPENER_TOKENIZE_URL: http://tokenizer
+            SANIC_OPENER_POS_URL: http://pos_tagger
+            SANIC_OPENER_NER_URL: http://ner
+            SANIC_OPENER_KAF2JSON_URL: http://kaf2json
+        ports:
+            - 9999:80
+        depends_on:
+        - language_identifier
+        - tokenizer
+        - pos_tagger
+        - ner
+        - kaf2json
+
+    language_identifier:
+        image: 192.168.65.5:8093/cwolff/opener-docker-language-identifier
+
+    tokenizer:
+        image: 192.168.65.5:8093/cwolff/opener-docker-tokenizer
+
+    pos_tagger:
+        image: 192.168.65.5:8093/cwolff/opener-docker-pos-tagger
+
+    ner:
+        image: 192.168.65.5:8093/cwolff/opener-docker-ner
+
+    kaf2json:
+        image: 192.168.65.5:8093/cwolff/opener-docker-kaf2json
+    yummy-app:
+        image: 192.168.65.5:8093/yummy:latest
+        environment:
+        # - _JAVA_OPTIONS=-Xmx512m -Xms256m
+        - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka
+        - SPRING_CLOUD_STREAM_KAFKA_BINDER_ZK_NODES=zookeeper
+        - SPRING_CLOUD_STREAM_KAFKA_BINDINGS_INPUT_BINDER=kafka
+        - SPRING_CLOUD_STREAM_KAFKA_BINDINGS_INPUT_DESTINATION=topicjson
+        - SPRING_CLOUD_STREAM_KAFKA_BINDINGS_OUTPUT_BINDER=kafka
+        - SPRING_CLOUD_STREAM_KAFKA_BINDINGS_OUTPUT_DESTINATION=topicjson
+        - FORMAT=dd/MM/YYYY hh:mm:ss
+        - FIXED-DELAY=3000
+        - URLNER=http://192.168.65.0:9999/opener
+        - URLINSIGHT=http://192.168.65.0:8080/api/
+        - NER=true
+        networks:
+          - insight
+networks:
+    insight:
+        driver: bridge          
+          
