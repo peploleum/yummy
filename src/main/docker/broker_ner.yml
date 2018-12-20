@@ -1,19 +1,35 @@
 version: '3'
 services:
+    nifi:
+        image: apache/nifi:latest
+        container_name: nifi
+        ports:
+          - "8090:8080"
+        volumes:
+          - ./feeder/templates/:/opt/nifi/nifi-current/conf/templates/
+          - ./feeder/config/:/opt/nifi/nifi-current/config/
+          - ./feeder/xml/:/opt/nifi/nifi-current/xml/
+        networks:
+        - insight
     zookeeper:
-            image: wurstmeister/zookeeper:latest
-            container_name: zookeeper
-            ports:
-              - 2181:2181
+        image: wurstmeister/zookeeper:latest
+        container_name: zookeeper
+        ports:
+           - 2181:2181
+        networks:
+        - insight
     kafka:
         image: wurstmeister/kafka:latest
         environment:
-           KAFKA_ADVERTISED_HOST_NAME: 10.71.2.85
+           KAFKA_ADVERTISED_HOST_NAME: 10.71.2.66
            KAFKA_ADVERTISED_PORT: 8092
            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
            KAFKA_CREATE_TOPICS: "topicrss:1:1,topicjson:1:1"
         ports:
           - 8092:9092
+        networks:
+        - insight
+          
     wrapper:
         image: cwolff/opener-docker-wrapper
         build:
@@ -47,3 +63,6 @@ services:
 
     kaf2json:
         image: cwolff/opener-docker-kaf2json
+networks:
+    insight:
+        driver: bridge
