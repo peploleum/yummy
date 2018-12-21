@@ -3,8 +3,6 @@ ARG ELK_VERSION
 # https://github.com/elastic/elasticsearch-docker
 FROM docker.elastic.co/elasticsearch/elasticsearch-oss:${ELK_VERSION}
 
-RUN bin/elasticsearch-plugin install analysis-icu
-
 #copie des fichiers a lancer pour attendre démarrage d'elastic et cree index
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 COPY config/elasticsearch.yml config/elasticsearch.yml
