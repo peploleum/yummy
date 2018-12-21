@@ -4,7 +4,6 @@ import com.peploleum.insight.yummy.dto.Entity;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.RawDataDTO;
 import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
-import com.peploleum.insight.yummy.dto.entities.EventDTO;
 import com.peploleum.insight.yummy.dto.entities.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
 import com.peploleum.insight.yummy.dto.source.RssSourceMessage;
@@ -59,7 +58,7 @@ public class NerResponseHandler {
     }
 
     private List<Object> buildResponseEntities() {
-        if (this.nerResponse == null)
+        if (this.nerResponse == null || this.nerResponse.getEntities() == null)
             return new ArrayList<>();
         List<Object> insightEntities = this.nerResponse.getEntities().values().stream()
                 .map(dto -> mapToEntityDto(dto)).filter(dto -> dto != null)

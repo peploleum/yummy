@@ -1,19 +1,19 @@
 spring:
   main:
     web-application-type: none
-  #cloud:
-  #  stream:
-  #    kafka:
-  #      binder:
-  #        brokers: 10.71.2.66:8092
-  #        zk-nodes: localhost
-  #    bindings:
-  #      input:
-  #        binder: kafka
-  #        destination: topicjson
-  #      output:
-  #        binder: kafka
-  #        destination: topicjson
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: 10.71.2.66:8092
+          zk-nodes: localhost
+      bindings:
+        input:
+          binder: kafka
+          destination: topicjson
+        output:
+          binder: kafka
+          destination: topicjson
 format: dd/MM/YYYY hh:mm:ss
 fixed-delay: 3000
 urlner: http://192.168.99.100:9999/opener
