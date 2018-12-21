@@ -1,0 +1,50 @@
+version: '3'
+services:
+  elasticsearch:
+    build:
+      context: ./elasticsearch/
+      args:
+        ELK_VERSION: 6.4.2
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - insight
+  logstash:
+    build:
+      context: ./logstash/
+      args:
+        ELK_VERSION: 6.4.2
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/in:/usr/share/logstash/in
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - insight
+    depends_on:
+      - elasticsearch
+  kibana:
+    build:
+      context: ./kibana/
+      args:
+        ELK_VERSION: 6.4.2
+    volumes:
+      - ./kibana/config/:/usr/share/kibana/config:ro
+    ports:
+      - "5601:5601"
+    networks:
+      - insight
+    depends_on:
+      - elasticsearch
+networks:
+  insight:
+    driver: bridge
