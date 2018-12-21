@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 
 @Configuration
-@EnableBinding(value = {Sink.class})
+// @EnableBinding(value = {Sink.class})
 public class RawDataSink {
     private final Logger log = LoggerFactory.getLogger(RawDataSink.class);
 
@@ -31,7 +31,7 @@ public class RawDataSink {
     @Value("${ner}")
     private boolean ner;
 
-    @StreamListener(Sink.INPUT)
+    //@StreamListener(Sink.INPUT)
     public void handle(String message) {
         try {
             ObjectMapper mapperObj = new ObjectMapper();

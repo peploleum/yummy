@@ -1,21 +1,18 @@
 package com.peploleum.insight.yummy.dto;
 
+import com.fasterxml.jackson.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "text",
         "language",
         "terms",
-        "lp"
+        "lp",
+        "entities"
 })
 public class NerJsonObjectResponse {
 
@@ -24,7 +21,9 @@ public class NerJsonObjectResponse {
     @JsonProperty("language")
     private String language;
     @JsonProperty("terms")
-    private Map<String,Term> terms;
+    private Map<String, Term> terms;
+    @JsonProperty("entities")
+    private Map<String, Entity> entities;
     @JsonProperty("lp")
     private List<Lp> lp = null;
     @JsonIgnore
@@ -78,6 +77,16 @@ public class NerJsonObjectResponse {
     @JsonProperty("lp")
     public void setLp(List<Lp> lp) {
         this.lp = lp;
+    }
+
+    @JsonProperty("entities")
+    public Map<String, Entity> getEntities() {
+        return entities;
+    }
+
+    @JsonProperty("entities")
+    public void setEntities(Map<String, Entity> entities) {
+        this.entities = entities;
     }
 
     @JsonAnyGetter

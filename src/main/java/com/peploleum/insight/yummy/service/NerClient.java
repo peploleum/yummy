@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class NerClient {
@@ -31,12 +30,13 @@ public class NerClient {
 
             int cpt = 0;
             for (Item item : message.getChannel().getItem()
-            ) {
+                    ) {
                 NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
                 nerQuery.addsteps("identify_language,tokenize,pos,ner");
                 final String nerCandidate = (item.getDescription() != null && !item.getDescription().isEmpty()) ? item.getDescription() : item.getTitle();
                 nerQuery.setText(nerCandidate);
-                NerJsonObjectResponse nerObjectRespone = null;
+                NerJsonObjectResponse nerObjectResponse = null;
+
                 if (useNer) {
                     final String dummyPayloadAsString = mapperObj.writeValueAsString(nerQuery);
                     log.info("Payload: " + dummyPayloadAsString);
@@ -46,36 +46,24 @@ public class NerClient {
                     headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
                     final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
                     final ResponseEntity<String> tResponseEntity = rt.exchange(urlner, HttpMethod.POST, entity, String.class);
-                    nerObjectRespone = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
-                    nerObjectRespone.setContent(tResponseEntity.getBody());
-                    //RawDataDTO dataRaw=createDatarow(nerObjectRespone,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
+
+                    nerObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
+                    nerObjectResponse.setContent(tResponseEntity.getBody());
+                    //RawDataDTO dataRaw=createDatarow(nerObjectResponse,message.getTitle().get(cpt),message.getSoureData(),message.getLink().get(cpt), message.getDateTraiment());
                     log.info("Received " + tResponseEntity.getBody());
                 }
-                RawDataDTO dto = new RawDataDTO();
-                dto.setRawDataName(message.getChannel().getTitle());
-                dto.setRawDataCreationDate(LocalDate.now());
-                dto.setRawDataType("RSS");
-                try {
-                    if (message.getChannel().getLink() instanceof ArrayList) {
-                        dto.setRawDataSourceUri(((ArrayList) message.getChannel().getLink()).get(0).toString());
-                    }
-                    if (message.getChannel().getLink() instanceof String) {
-                        dto.setRawDataSourceUri((String) message.getChannel().getLink());
-                    }
-                } catch (Exception e) {
-                    // nothing
+
+                final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, message, nerCandidate);
+
+                InsightPostman insightPostman = new InsightPostman(urlinsight);
+                insightPostman.sendToInsight(responseHandler.getRawDataDto());
+                for (Object o : responseHandler.getInsightEntities()) {
+                    insightPostman.sendToInsight(o);
                 }
-                dto.setRawDataContent(nerCandidate);
-                if (nerObjectRespone != null) {
-                    dto.setRawDataAnnotations(nerObjectRespone.getContent());
-                    dto.setRawDataDataContentType(nerObjectRespone.getLanguage());
-                }
-                new InsightPostman(urlinsight).sendRaw(dto);
 
                 cpt++;
             }
-
-
+            log.info("Number of Items processed : " + cpt);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -108,7 +96,7 @@ public class NerClient {
             dataRaw = createDatarowNoDate(nerObjectRespone, message.getTitle().get(cpt), message.getSoureData(), message.getLink().get(cpt));
 
             log.info("Received " + tResponseEntity.getBody());
-            new InsightPostman(urlinsight).sendRaw(dataRaw);
+            new InsightPostman(urlinsight).sendToInsight(dataRaw);
 
 
         } catch (IOException e) {

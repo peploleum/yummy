@@ -1,6 +1,10 @@
 package com.peploleum.insight.yummy.service;
 
 import com.peploleum.insight.yummy.dto.RawDataDTO;
+import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
+import com.peploleum.insight.yummy.dto.entities.EventDTO;
+import com.peploleum.insight.yummy.dto.entities.LocationDTO;
+import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -25,8 +29,7 @@ public class InsightPostman {
         this.INSIGHT_APP_API_URI = insightAppUrl;
     }
 
-    public void doSend(RawDataDTO dto, List<String> cookies) {
-        final RestTemplate rt = new RestTemplate();
+    private HttpHeaders getHttpJsonHeader(List<String> cookies) {
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -34,10 +37,30 @@ public class InsightPostman {
         for (String cookie : cookies) {
             headers.add("Cookie", cookie);
         }
-        final HttpEntity<RawDataDTO> entity = new HttpEntity<>(dto, headers);
+        return headers;
+    }
+
+    private static String getInsigthMethodUrl(Object o) {
+        if (o instanceof BiographicsDTO) {
+            return "biographics";
+        } else if (o instanceof LocationDTO) {
+            return "locations";
+        } else if (o instanceof OrganisationDTO) {
+            return "organisations";
+        } else if (o instanceof RawDataDTO) {
+            return "raw-data";
+        } else {
+            return "";
+        }
+    }
+
+    public void doSend(Object dto, List<String> cookies) {
+        final RestTemplate rt = new RestTemplate();
+        final HttpHeaders headers = this.getHttpJsonHeader(cookies);
         final ResponseEntity<String> tResponseEntity;
         try {
-            tResponseEntity = rt.exchange(this.INSIGHT_APP_API_URI + "raw-data", HttpMethod.POST, entity, String.class);
+            tResponseEntity = rt.exchange(this.INSIGHT_APP_API_URI + getInsigthMethodUrl(dto), HttpMethod.POST,
+                    new HttpEntity<>(dto, headers), String.class);
             log.info("Received " + tResponseEntity);
         } catch (RestClientException e) {
             this.log.error(e.getMessage(), e);
@@ -120,19 +143,22 @@ public class InsightPostman {
         return null;
     }
 
-    public void sendRaw(RawDataDTO dto) {
-        this.log.info("Sending Raw data");
-
+    private List<String> getCookies() {
         final String accountCookie = this.account();
         if (accountCookie == null)
-            return;
+            return null;
         this.log.info("account cookie received");
-        final List<String> cookies = this.authent(accountCookie);
+        return this.authent(accountCookie);
+    }
+
+    public void sendToInsight(Object entity) {
+        this.log.info("Sending Entity");
+        List<String> cookies = this.getCookies();
         if (cookies == null) {
             return;
         }
         this.log.info("session cookie received");
-        this.doSend(dto, cookies);
+        this.doSend(entity, cookies);
     }
 
     public static void main(String[] args) {
@@ -141,6 +167,8 @@ public class InsightPostman {
         dto.setRawDataContent(UUID.randomUUID().toString());
         dto.setRawDataCreationDate(LocalDate.now());
         dto.setRawDataName(UUID.randomUUID().toString());
-        insightPostman.sendRaw(dto);
+        insightPostman.sendToInsight(dto);
     }
+
+
 }
