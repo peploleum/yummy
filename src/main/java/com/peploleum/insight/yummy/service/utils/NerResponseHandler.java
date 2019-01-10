@@ -67,6 +67,7 @@ public class NerResponseHandler {
             case PER:
                 final BiographicsDTO biographicsDTO = new BiographicsDTO();
                 biographicsDTO.setBiographicsName(entity.getText());
+                biographicsDTO.setBiographicsFirstname(" ");
                 return biographicsDTO;
             default:
                 return null;
