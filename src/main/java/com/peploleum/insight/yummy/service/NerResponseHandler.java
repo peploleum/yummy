@@ -2,7 +2,7 @@ package com.peploleum.insight.yummy.service;
 
 import com.peploleum.insight.yummy.dto.Entity;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.RawDataDTO;
+import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;

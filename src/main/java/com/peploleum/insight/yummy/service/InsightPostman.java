@@ -1,10 +1,6 @@
 package com.peploleum.insight.yummy.service;
 
-import com.peploleum.insight.yummy.dto.RawDataDTO;
-import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
-import com.peploleum.insight.yummy.dto.entities.EventDTO;
-import com.peploleum.insight.yummy.dto.entities.LocationDTO;
-import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
+import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +15,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class InsightPostman {
     private final Logger log = LoggerFactory.getLogger(InsightPostman.class);

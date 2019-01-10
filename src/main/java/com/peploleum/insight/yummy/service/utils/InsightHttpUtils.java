@@ -1,6 +1,6 @@
 package com.peploleum.insight.yummy.service.utils;
 
-import com.peploleum.insight.yummy.dto.RawDataDTO;
+import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by gFolgoas on 21/12/2018.
- */
 public class InsightHttpUtils {
 
     public static HttpHeaders getHttpJsonHeader(List<String> cookies) {
