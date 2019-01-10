@@ -58,6 +58,7 @@ public class InsightClientService {
                     new HttpEntity<>(dto, headers), String.class);
             log.debug("Received " + tResponseEntity);
         } catch (RestClientException e) {
+            this.log.warn("Failed to send entity");
             this.log.debug(e.getMessage(), e);
             throw e;
         }
