@@ -16,25 +16,25 @@ import java.util.stream.Collectors;
 public class NerResponseHandler {
 
     private final NerJsonObjectResponse nerResponse;
-    private final SimpleRawData simple;
+    private final SimpleRawData simpleRawData;
 
     private List<Object> insightEntities;
     private RawDataDTO rawDataDto;
 
     public NerResponseHandler(final NerJsonObjectResponse nerResponse, final SimpleRawData simple) {
         this.nerResponse = nerResponse;
-        this.simple = simple;
+        this.simpleRawData = simple;
         this.rawDataDto = buildRawDataDto();
         this.insightEntities = buildResponseEntities();
     }
 
     private RawDataDTO buildRawDataDto() {
         RawDataDTO dto = new RawDataDTO();
-        dto.setRawDataName(this.simple.getSourceName());
+        dto.setRawDataName(this.simpleRawData.getSourceName());
         dto.setRawDataCreationDate(LocalDate.now());
-        dto.setRawDataType("RSS");
-        dto.setRawDataSourceUri(this.simple.getSourceUrl());
-        dto.setRawDataContent(this.simple.getText());
+        dto.setRawDataType(this.simpleRawData.getSourceType());
+        dto.setRawDataSourceUri(this.simpleRawData.getSourceUrl());
+        dto.setRawDataContent(this.simpleRawData.getText());
         if (this.nerResponse != null) {
             dto.setRawDataAnnotations(this.nerResponse.getContent());
             dto.setRawDataDataContentType(this.nerResponse.getLanguage());

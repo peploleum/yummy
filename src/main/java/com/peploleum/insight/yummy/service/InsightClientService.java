@@ -47,7 +47,12 @@ public class InsightClientService {
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         final ResponseEntity<String> tResponseEntity;
         try {
-            tResponseEntity = rt.exchange(this.urlinsight + InsightHttpUtils.getInsigthMethodUrl(dto), HttpMethod.POST,
+            final String insigthMethodUrl = InsightHttpUtils.getInsigthMethodUrl(dto);
+            if (insigthMethodUrl.isEmpty()) {
+                this.log.warn("Failed to find endpoint for entity");
+                return;
+            }
+            tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
             log.debug("Received " + tResponseEntity);
         } catch (RestClientException e) {

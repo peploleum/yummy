@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class NerClientService {
@@ -107,8 +108,11 @@ public class NerClientService {
 
     private void submitInsightRequest(SimpleRawData simpleRawData, NerJsonObjectResponse nerObjectResponse) throws IOException {
         final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, simpleRawData);
+        log.info("Sending raw data to Insight");
         this.insightClientService.sendToInsight(responseHandler.getRawDataDto());
-        for (Object o : responseHandler.getInsightEntities()) {
+        final List<Object> insightEntities = responseHandler.getInsightEntities();
+        log.info("Sending " + insightEntities.size() + " entities to Insight");
+        for (Object o : insightEntities) {
             this.insightClientService.sendToInsight(o);
         }
     }
