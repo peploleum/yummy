@@ -3,8 +3,8 @@ package com.peploleum.insight.yummy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.config.TimerSource;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.source.RssSourceMessage;
-import com.peploleum.insight.yummy.service.NerClient;
+import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
+import com.peploleum.insight.yummy.service.NerClientService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class YummyApplicationTests {
 
     @Autowired
-    private NerClient nerClient;
+    private NerClientService nerClientService;
 
     @Test
     public void contextLoads() {
@@ -34,7 +34,7 @@ public class YummyApplicationTests {
         ObjectMapper mapper = new ObjectMapper();
         final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample.json");
         RssSourceMessage mess = mapper.readValue(resourceAsStream, RssSourceMessage.class);
-        this.nerClient.doSend(mess);
+        this.nerClientService.doSend(mess);
     }
 
     @Test

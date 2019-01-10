@@ -1,28 +1,27 @@
 package com.peploleum.insight.yummy.service;
 
-import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
+@Service
 public class InsightPostman {
-    private final Logger log = LoggerFactory.getLogger(InsightPostman.class);
-    private String INSIGHT_APP_API_URI;
 
-    public InsightPostman(final String insightAppUrl) {
-        this.INSIGHT_APP_API_URI = insightAppUrl;
-    }
+    @Value("${urlinsight}")
+    private String urlinsight;
+
+    private final Logger log = LoggerFactory.getLogger(InsightPostman.class);
 
     public void sendToInsight(Object entity) {
         this.log.info("Sending Entity");
@@ -40,7 +39,7 @@ public class InsightPostman {
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(cookies);
         final ResponseEntity<String> tResponseEntity;
         try {
-            tResponseEntity = rt.exchange(this.INSIGHT_APP_API_URI + InsightHttpUtils.getInsigthMethodUrl(dto), HttpMethod.POST,
+            tResponseEntity = rt.exchange(this.urlinsight + InsightHttpUtils.getInsigthMethodUrl(dto), HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
             log.info("Received " + tResponseEntity);
         } catch (RestClientException e) {
@@ -55,7 +54,7 @@ public class InsightPostman {
         final HttpEntity<String> entity = new HttpEntity<>(headers);
         final ResponseEntity<String> forEntity;
         try {
-            forEntity = rt.exchange(INSIGHT_APP_API_URI + "account", HttpMethod.GET, entity, String.class);
+            forEntity = rt.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
             log.info("Received " + forEntity);
 
         } catch (RestClientException e) {
@@ -83,7 +82,7 @@ public class InsightPostman {
         headers.add("Cookie", "XSRF-TOKEN=" + accountCookie);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         try {
-            final ResponseEntity<String> exchange = rt.exchange(INSIGHT_APP_API_URI + "authentication", HttpMethod.POST, request, String.class);
+            final ResponseEntity<String> exchange = rt.exchange(this.urlinsight + "authentication", HttpMethod.POST, request, String.class);
             final List<String> cookies = exchange.getHeaders().get("Set-Cookie");
             final String xsrfValue = InsightHttpUtils.extractXsrf(cookies);
             final String jessionId = InsightHttpUtils.extractJessionId(cookies);
@@ -105,15 +104,4 @@ public class InsightPostman {
         this.log.info("account cookie received");
         return this.authent(accountCookie);
     }
-
-    public static void main(String[] args) {
-        final InsightPostman insightPostman = new InsightPostman("http://localhost:8080/api/");
-        RawDataDTO dto = new RawDataDTO();
-        dto.setRawDataContent(UUID.randomUUID().toString());
-        dto.setRawDataCreationDate(LocalDate.now());
-        dto.setRawDataName(UUID.randomUUID().toString());
-        insightPostman.sendToInsight(dto);
-    }
-
-
 }

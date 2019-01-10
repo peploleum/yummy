@@ -6,7 +6,7 @@ import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
 import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
-import com.peploleum.insight.yummy.dto.source.RssSourceMessage;
+import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

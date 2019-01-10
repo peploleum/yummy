@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.source.Item;
-import com.peploleum.insight.yummy.dto.source.RssSourceMessage;
+import com.peploleum.insight.yummy.dto.source.rss.Item;
+import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 import com.peploleum.insight.yummy.service.utils.NerResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 @Service
-public class NerClient {
+public class NerClientService {
 
     @Value("${urlner}")
     private String urlner;
@@ -33,7 +34,10 @@ public class NerClient {
     @Value("${ner}")
     private boolean useNer;
 
-    private final Logger log = LoggerFactory.getLogger(InsightClient.class);
+    @Autowired
+    private InsightPostman insightPostman;
+
+    private final Logger log = LoggerFactory.getLogger(NerClientService.class);
 
     public void doSend(RssSourceMessage message) {
         final ObjectMapper mapperObj = new ObjectMapper();
@@ -42,7 +46,7 @@ public class NerClient {
 
             int cpt = 0;
             for (Item item : message.getChannel().getItem()) {
-                NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
+                final NerJsonObjectQuery nerQuery = new NerJsonObjectQuery();
                 nerQuery.addsteps("identify_language,tokenize,pos,ner");
                 final String nerCandidate = (item.getDescription() != null && !item.getDescription().isEmpty()) ? item.getDescription() : item.getTitle();
                 nerQuery.setText(nerCandidate);
@@ -65,10 +69,9 @@ public class NerClient {
 
                 final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, message, nerCandidate);
 
-                final InsightPostman insightPostman = new InsightPostman(this.urlinsight);
-                insightPostman.sendToInsight(responseHandler.getRawDataDto());
+                this.insightPostman.sendToInsight(responseHandler.getRawDataDto());
                 for (Object o : responseHandler.getInsightEntities()) {
-                    insightPostman.sendToInsight(o);
+                    this.insightPostman.sendToInsight(o);
                 }
 
                 cpt++;

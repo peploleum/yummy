@@ -1,5 +1,5 @@
 
-package com.peploleum.insight.yummy.dto.source;
+package com.peploleum.insight.yummy.dto.source.rss;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,36 +12,36 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "isPermaLink",
-    "$"
+    "type",
+    "url"
 })
-public class Guid {
+public class Enclosure {
 
-    @JsonProperty("isPermaLink")
-    private Boolean isPermaLink;
-    @JsonProperty("$")
-    private String $;
+    @JsonProperty("type")
+    private String type;
+    @JsonProperty("url")
+    private String url;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("isPermaLink")
-    public Boolean getIsPermaLink() {
-        return isPermaLink;
+    @JsonProperty("type")
+    public String getType() {
+        return type;
     }
 
-    @JsonProperty("isPermaLink")
-    public void setIsPermaLink(Boolean isPermaLink) {
-        this.isPermaLink = isPermaLink;
+    @JsonProperty("type")
+    public void setType(String type) {
+        this.type = type;
     }
 
-    @JsonProperty("$")
-    public String get$() {
-        return $;
+    @JsonProperty("url")
+    public String getUrl() {
+        return url;
     }
 
-    @JsonProperty("$")
-    public void set$(String $) {
-        this.$ = $;
+    @JsonProperty("url")
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @JsonAnyGetter

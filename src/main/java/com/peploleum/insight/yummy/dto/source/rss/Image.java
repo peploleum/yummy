@@ -1,5 +1,5 @@
 
-package com.peploleum.insight.yummy.dto.source;
+package com.peploleum.insight.yummy.dto.source.rss;
 
 import java.util.HashMap;
 import java.util.Map;
