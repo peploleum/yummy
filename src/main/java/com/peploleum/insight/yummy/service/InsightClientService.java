@@ -51,12 +51,14 @@ public class InsightClientService {
             if (insigthMethodUrl.isEmpty()) {
                 this.log.warn("Failed to find endpoint for entity");
                 return;
+            } else {
+                this.log.info("Sending " + dto.toString());
             }
             tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
             log.debug("Received " + tResponseEntity);
         } catch (RestClientException e) {
-            this.log.error(e.getMessage(), e);
+            this.log.debug(e.getMessage(), e);
             throw e;
         }
     }
