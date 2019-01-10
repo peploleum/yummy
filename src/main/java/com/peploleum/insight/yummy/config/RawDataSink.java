@@ -39,7 +39,10 @@ public class RawDataSink {
             try {
                 final RssSourceMessage rssSourceMessage = mapperObj.readValue(message, RssSourceMessage.class);
                 log.info("Sucessfully parsed RssMessage.");
-                this.nerClientService.doSend(rssSourceMessage);
+                final boolean success = this.nerClientService.doSend(rssSourceMessage);
+                if (!success) {
+                    log.warn("Failed to process message : " + message);
+                }
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }

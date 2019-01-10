@@ -47,15 +47,15 @@ public class NerClientService {
         this.mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
-    public void doSend(final Object message) throws IOException {
+    public boolean doSend(final Object message) throws IOException {
         if (message instanceof RssSourceMessage) {
             try {
                 this.log.info("Processing RSS message");
                 final RssSourceMessage rssSourceMessage = (RssSourceMessage) message;
                 int cpt = 0;
                 if (rssSourceMessage.getChannel() == null || rssSourceMessage.getChannel().getItem() == null) {
-                    this.log.warn("Rss message has no readable channel or channel with no content");
-                    return;
+                    this.log.warn("Rss message has no readable channel or channel with no content:");
+                    return false;
                 }
                 this.log.info("Items to process: " + rssSourceMessage.getChannel().getItem().size());
                 for (Item item : rssSourceMessage.getChannel().getItem()) {
@@ -85,6 +85,7 @@ public class NerClientService {
             }
             submitInsightRequest(simpleRawData, nerJsonObjectResponse);
         }
+        return true;
     }
 
     public NerJsonObjectResponse submitNerRequest(final SimpleRawData simpleRawData) throws IOException {
