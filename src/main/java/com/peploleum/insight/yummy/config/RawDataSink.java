@@ -24,21 +24,24 @@ public class RawDataSink {
 
     @StreamListener(Sink.INPUT)
     public void handle(String message) {
-        log.info("Yummy received raw message: " + message);
+        log.info("Yummy received raw message");
+        log.debug("message content is: " + message);
         final ObjectMapper mapperObj = new ObjectMapper();
-        try {
-            final RssSourceMessage rssSourceMessage = mapperObj.readValue(message, RssSourceMessage.class);
-            log.info("Sucessfully parsed RssMessage.");
-            this.nerClientService.doSend(rssSourceMessage);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            final TwitterSourceMessage twitterSourceMessage;
+        if (message.contains("created_at")) {
             try {
-                twitterSourceMessage = mapperObj.readValue(message, TwitterSourceMessage.class);
+                final TwitterSourceMessage twitterSourceMessage = mapperObj.readValue(message, TwitterSourceMessage.class);
                 log.info("Sucessfully parsed TwitterMessage.");
                 this.nerClientService.doSend(twitterSourceMessage);
             } catch (IOException e1) {
                 this.log.error(e1.getMessage(), e1);
+            }
+        } else {
+            try {
+                final RssSourceMessage rssSourceMessage = mapperObj.readValue(message, RssSourceMessage.class);
+                log.info("Sucessfully parsed RssMessage.");
+                this.nerClientService.doSend(rssSourceMessage);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
             }
         }
     }

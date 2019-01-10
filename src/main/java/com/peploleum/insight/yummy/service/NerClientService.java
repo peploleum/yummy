@@ -52,6 +52,10 @@ public class NerClientService {
                 this.log.info("Processing RSS message");
                 final RssSourceMessage rssSourceMessage = (RssSourceMessage) message;
                 int cpt = 0;
+                if (rssSourceMessage.getChannel() == null || rssSourceMessage.getChannel().getItem() == null) {
+                    this.log.warn("Rss message has no readable channel or channel with no content");
+                    return;
+                }
                 this.log.info("Items to process: " + rssSourceMessage.getChannel().getItem().size());
                 for (Item item : rssSourceMessage.getChannel().getItem()) {
                     final String nerCandidate = (item.getDescription() != null && !item.getDescription().isEmpty()) ? item.getDescription() : item.getTitle();
