@@ -12,31 +12,38 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class InsightPostman {
+public class InsightClientService {
 
     @Value("${urlinsight}")
     private String urlinsight;
 
-    private final Logger log = LoggerFactory.getLogger(InsightPostman.class);
+    private final Logger log = LoggerFactory.getLogger(InsightClientService.class);
+    private List<String> cookies;
+
+    @PostConstruct
+    private void onConstruct() {
+        this.cookies = this.getCookies();
+    }
 
     public void sendToInsight(Object entity) {
         this.log.info("Sending Entity");
-        List<String> cookies = this.getCookies();
-        if (cookies == null) {
+        if (this.cookies == null) {
+            this.log.error("Anthentication failed. Object will not be sent.");
             return;
         }
-        this.log.info("session cookie received");
-        this.doSend(entity, cookies);
+        this.log.info("Session cookie found");
+        this.doSend(entity);
     }
 
 
-    public void doSend(Object dto, List<String> cookies) {
+    private void doSend(final Object dto) {
         final RestTemplate rt = new RestTemplate();
-        final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(cookies);
+        final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         final ResponseEntity<String> tResponseEntity;
         try {
             tResponseEntity = rt.exchange(this.urlinsight + InsightHttpUtils.getInsigthMethodUrl(dto), HttpMethod.POST,
@@ -59,10 +66,12 @@ public class InsightPostman {
 
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException.Unauthorized) {
-                log.info("Non autorisé");
+                log.info("Unauthorized. Need to retrieve session cookie for future requests.");
                 final List<String> cookies = ((HttpClientErrorException.Unauthorized) e).getResponseHeaders().get("Set-Cookie");
                 final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
                 return actualCookie;
+            } else {
+                log.error("Failed to contact account service.", e);
             }
         }
         return null;

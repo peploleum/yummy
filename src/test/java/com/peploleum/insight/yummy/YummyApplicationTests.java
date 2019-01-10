@@ -3,7 +3,9 @@ package com.peploleum.insight.yummy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.config.TimerSource;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
+import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
+import com.peploleum.insight.yummy.service.InsightClientService;
 import com.peploleum.insight.yummy.service.NerClientService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,16 +28,11 @@ public class YummyApplicationTests {
     @Autowired
     private NerClientService nerClientService;
 
-    @Test
-    public void contextLoads() {
-    }
+    @Autowired
+    private InsightClientService insightClientService;
 
     @Test
-    public void ner() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample.json");
-        RssSourceMessage mess = mapper.readValue(resourceAsStream, RssSourceMessage.class);
-        this.nerClientService.doSend(mess);
+    public void contextLoads() {
     }
 
     @Test
@@ -46,6 +44,22 @@ public class YummyApplicationTests {
         assertThat(nerJsonObjectResponse.getText()).isNotEmpty();
         log.info(nerJsonObjectResponse.getText());
         assertThat(nerJsonObjectResponse.getTerms().get("t1") != null).isTrue();
+    }
+
+    @Test
+    public void ner() throws IOException {
+        final ObjectMapper mapper = new ObjectMapper();
+        final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample.json");
+        final RssSourceMessage mess = mapper.readValue(resourceAsStream, RssSourceMessage.class);
+        this.nerClientService.doSend(mess);
+    }
+
+    @Test
+    public void insightPostmanTest() {
+        RawDataDTO rawDataDTO = new RawDataDTO();
+        rawDataDTO.setRawDataContent("test");
+        rawDataDTO.setRawDataCreationDate(LocalDate.now());
+        this.insightClientService.sendToInsight(rawDataDTO);
     }
 
 }

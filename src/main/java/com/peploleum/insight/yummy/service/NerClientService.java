@@ -35,7 +35,7 @@ public class NerClientService {
     private boolean useNer;
 
     @Autowired
-    private InsightPostman insightPostman;
+    private InsightClientService insightClientService;
 
     private final Logger log = LoggerFactory.getLogger(NerClientService.class);
 
@@ -69,9 +69,9 @@ public class NerClientService {
 
                 final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, message, nerCandidate);
 
-                this.insightPostman.sendToInsight(responseHandler.getRawDataDto());
+                this.insightClientService.sendToInsight(responseHandler.getRawDataDto());
                 for (Object o : responseHandler.getInsightEntities()) {
-                    this.insightPostman.sendToInsight(o);
+                    this.insightClientService.sendToInsight(o);
                 }
 
                 cpt++;
