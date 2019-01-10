@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,27 +31,28 @@ public class InsightClientService {
         this.cookies = this.getCookies();
     }
 
-    public void sendToInsight(Object entity) {
-        this.log.info("Sending Entity");
+    public void sendToInsight(Object entity) throws IOException {
+        this.log.debug("Sending Entity");
         if (this.cookies == null) {
             this.log.error("Anthentication failed. Object will not be sent.");
-            return;
+            throw new IOException("Authentication information not found.");
         }
-        this.log.info("Session cookie found");
+        this.log.debug("Session cookie found");
         this.doSend(entity);
     }
 
 
-    private void doSend(final Object dto) {
+    private void doSend(final Object dto) throws RestClientException {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         final ResponseEntity<String> tResponseEntity;
         try {
             tResponseEntity = rt.exchange(this.urlinsight + InsightHttpUtils.getInsigthMethodUrl(dto), HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
-            log.info("Received " + tResponseEntity);
+            log.debug("Received " + tResponseEntity);
         } catch (RestClientException e) {
             this.log.error(e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -62,11 +64,11 @@ public class InsightClientService {
         final ResponseEntity<String> forEntity;
         try {
             forEntity = rt.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
-            log.info("Received " + forEntity);
+            log.debug("Received " + forEntity);
 
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException.Unauthorized) {
-                log.info("Unauthorized. Need to retrieve session cookie for future requests.");
+                log.debug("Unauthorized. Need to retrieve session cookie for future requests.");
                 final List<String> cookies = ((HttpClientErrorException.Unauthorized) e).getResponseHeaders().get("Set-Cookie");
                 final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
                 return actualCookie;
@@ -110,7 +112,7 @@ public class InsightClientService {
         final String accountCookie = this.account();
         if (accountCookie == null)
             return null;
-        this.log.info("account cookie received");
+        this.log.debug("account cookie received");
         return this.authent(accountCookie);
     }
 }

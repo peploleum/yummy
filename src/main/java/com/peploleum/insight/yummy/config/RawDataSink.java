@@ -2,6 +2,7 @@ package com.peploleum.insight.yummy.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
+import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
 import com.peploleum.insight.yummy.service.NerClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +24,22 @@ public class RawDataSink {
 
     @StreamListener(Sink.INPUT)
     public void handle(String message) {
+        log.info("Yummy received raw message: " + message);
+        final ObjectMapper mapperObj = new ObjectMapper();
         try {
-            final ObjectMapper mapperObj = new ObjectMapper();
-            final RssSourceMessage mess = mapperObj.readValue(message, RssSourceMessage.class);
-            final String display = "Received: " + message;
-            log.info(display);
-            this.nerClientService.doSend(mess);
+            final RssSourceMessage rssSourceMessage = mapperObj.readValue(message, RssSourceMessage.class);
+            log.info("Sucessfully parsed RssMessage.");
+            this.nerClientService.doSend(rssSourceMessage);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
+            final TwitterSourceMessage twitterSourceMessage;
+            try {
+                twitterSourceMessage = mapperObj.readValue(message, TwitterSourceMessage.class);
+                log.info("Sucessfully parsed TwitterMessage.");
+                this.nerClientService.doSend(twitterSourceMessage);
+            } catch (IOException e1) {
+                this.log.error(e1.getMessage(), e1);
+            }
         }
     }
 

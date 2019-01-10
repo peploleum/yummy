@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.config.TimerSource;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
+import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
+import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
 import com.peploleum.insight.yummy.service.InsightClientService;
 import com.peploleum.insight.yummy.service.NerClientService;
 import org.junit.Test;
@@ -36,8 +38,8 @@ public class YummyApplicationTests {
     }
 
     @Test
-    public void nerObjectResponseTest() throws IOException {
-        final Logger log = LoggerFactory.getLogger(TimerSource.class);
+    public void nerJsonObjectResponseTest() throws IOException {
+        final Logger log = LoggerFactory.getLogger(YummyApplicationTests.class);
         ObjectMapper mapper = new ObjectMapper();
         final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/bidou.json");
         final NerJsonObjectResponse nerJsonObjectResponse = mapper.readValue(resourceAsStream, NerJsonObjectResponse.class);
@@ -47,7 +49,27 @@ public class YummyApplicationTests {
     }
 
     @Test
-    public void ner() throws IOException {
+    public void twitterSourceMessageTest() throws IOException {
+        final Logger log = LoggerFactory.getLogger(YummyApplicationTests.class);
+        ObjectMapper mapper = new ObjectMapper();
+        final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample_twitter.json");
+        final TwitterSourceMessage twitterSourceMessage = mapper.readValue(resourceAsStream, TwitterSourceMessage.class);
+        assertThat(twitterSourceMessage.getText()).isNotEmpty();
+        log.info(twitterSourceMessage.getText());
+        assertThat(twitterSourceMessage.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    public void twitterMessageToNerTest() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample_twitter.json");
+        final TwitterSourceMessage twitterSourceMessage = mapper.readValue(resourceAsStream, TwitterSourceMessage.class);
+        final SimpleRawData simpleRawData = SimpleRawData.fromTwitterSourceMessage(twitterSourceMessage);
+        this.nerClientService.submitNerRequest(simpleRawData);
+    }
+
+    @Test
+    public void rssMessageToNerToInsightTest() throws IOException {
         final ObjectMapper mapper = new ObjectMapper();
         final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample.json");
         final RssSourceMessage mess = mapper.readValue(resourceAsStream, RssSourceMessage.class);
@@ -55,8 +77,8 @@ public class YummyApplicationTests {
     }
 
     @Test
-    public void insightPostmanTest() {
-        RawDataDTO rawDataDTO = new RawDataDTO();
+    public void insightPostmanTest() throws IOException {
+        final RawDataDTO rawDataDTO = new RawDataDTO();
         rawDataDTO.setRawDataContent("test");
         rawDataDTO.setRawDataCreationDate(LocalDate.now());
         this.insightClientService.sendToInsight(rawDataDTO);

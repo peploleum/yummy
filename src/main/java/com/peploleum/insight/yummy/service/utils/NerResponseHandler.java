@@ -6,7 +6,7 @@ import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
 import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
-import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
+import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,37 +16,25 @@ import java.util.stream.Collectors;
 public class NerResponseHandler {
 
     private final NerJsonObjectResponse nerResponse;
-    private final RssSourceMessage rssMessage;
-    private final String rssTextContent;
+    private final SimpleRawData simple;
 
     private List<Object> insightEntities;
     private RawDataDTO rawDataDto;
 
-    public NerResponseHandler(final NerJsonObjectResponse nerResponse, final RssSourceMessage rssMessage,
-                              final String rssTextContent) {
+    public NerResponseHandler(final NerJsonObjectResponse nerResponse, final SimpleRawData simple) {
         this.nerResponse = nerResponse;
-        this.rssMessage = rssMessage;
-        this.rssTextContent = rssTextContent;
+        this.simple = simple;
         this.rawDataDto = buildRawDataDto();
         this.insightEntities = buildResponseEntities();
     }
 
     private RawDataDTO buildRawDataDto() {
         RawDataDTO dto = new RawDataDTO();
-        dto.setRawDataName(this.rssMessage.getChannel().getTitle());
+        dto.setRawDataName(this.simple.getSourceName());
         dto.setRawDataCreationDate(LocalDate.now());
         dto.setRawDataType("RSS");
-        try {
-            if (this.rssMessage.getChannel().getLink() instanceof ArrayList) {
-                dto.setRawDataSourceUri(((ArrayList) this.rssMessage.getChannel().getLink()).get(0).toString());
-            }
-            if (this.rssMessage.getChannel().getLink() instanceof String) {
-                dto.setRawDataSourceUri((String) this.rssMessage.getChannel().getLink());
-            }
-        } catch (Exception e) {
-            // nothing
-        }
-        dto.setRawDataContent(this.rssTextContent);
+        dto.setRawDataSourceUri(this.simple.getSourceUrl());
+        dto.setRawDataContent(this.simple.getText());
         if (this.nerResponse != null) {
             dto.setRawDataAnnotations(this.nerResponse.getContent());
             dto.setRawDataDataContentType(this.nerResponse.getLanguage());
