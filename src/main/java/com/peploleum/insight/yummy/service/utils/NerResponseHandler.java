@@ -1,11 +1,11 @@
-package com.peploleum.insight.yummy.service;
+package com.peploleum.insight.yummy.service.utils;
 
 import com.peploleum.insight.yummy.dto.Entity;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
+import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.RssSourceMessage;
 
 import java.time.LocalDate;
@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by gFolgoas on 21/12/2018.
- */
 public class NerResponseHandler {
 
     private final NerJsonObjectResponse nerResponse;
