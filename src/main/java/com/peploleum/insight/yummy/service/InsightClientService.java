@@ -52,7 +52,7 @@ public class InsightClientService {
                 this.log.warn("Failed to find endpoint for entity");
                 return;
             } else {
-                this.log.info("Sending " + dto.toString());
+                this.log.debug("Sending " + dto.toString());
             }
             tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
