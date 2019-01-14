@@ -8,7 +8,7 @@ import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
 import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +31,7 @@ public class NerResponseHandler {
     private RawDataDTO buildRawDataDto() {
         RawDataDTO dto = new RawDataDTO();
         dto.setRawDataName(this.simpleRawData.getSourceName());
-        dto.setRawDataCreationDate(LocalDate.now());
+        dto.setRawDataCreationDate(Instant.now());
         dto.setRawDataType(this.simpleRawData.getSourceType());
         dto.setRawDataSourceUri(this.simpleRawData.getSourceUrl());
         dto.setRawDataContent(this.simpleRawData.getText());

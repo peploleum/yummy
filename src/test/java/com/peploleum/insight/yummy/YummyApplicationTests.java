@@ -1,7 +1,6 @@
 package com.peploleum.insight.yummy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.peploleum.insight.yummy.config.TimerSource;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
@@ -19,7 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -80,7 +79,7 @@ public class YummyApplicationTests {
     public void insightPostmanTest() throws IOException {
         final RawDataDTO rawDataDTO = new RawDataDTO();
         rawDataDTO.setRawDataContent("test");
-        rawDataDTO.setRawDataCreationDate(LocalDate.now());
+        rawDataDTO.setRawDataCreationDate(Instant.now());
         this.insightClientService.sendToInsight(rawDataDTO);
     }
 

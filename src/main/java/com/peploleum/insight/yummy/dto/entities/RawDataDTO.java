@@ -2,14 +2,13 @@ package com.peploleum.insight.yummy.dto.entities;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
  * A DTO for the RawData entity.
  */
 public class RawDataDTO implements Serializable {
-
 
     private String id;
 
@@ -28,9 +27,9 @@ public class RawDataDTO implements Serializable {
 
     private String rawDataContent;
 
-    private LocalDate rawDataCreationDate;
+    private Instant rawDataCreationDate;
 
-    private LocalDate rawDataExtractedDate;
+    private Instant rawDataExtractedDate;
 
     private String rawDataSymbol;
 
@@ -105,19 +104,19 @@ public class RawDataDTO implements Serializable {
         this.rawDataContent = rawDataContent;
     }
 
-    public LocalDate getRawDataCreationDate() {
+    public Instant getRawDataCreationDate() {
         return rawDataCreationDate;
     }
 
-    public void setRawDataCreationDate(LocalDate rawDataCreationDate) {
+    public void setRawDataCreationDate(Instant rawDataCreationDate) {
         this.rawDataCreationDate = rawDataCreationDate;
     }
 
-    public LocalDate getRawDataExtractedDate() {
+    public Instant getRawDataExtractedDate() {
         return rawDataExtractedDate;
     }
 
-    public void setRawDataExtractedDate(LocalDate rawDataExtractedDate) {
+    public void setRawDataExtractedDate(Instant rawDataExtractedDate) {
         this.rawDataExtractedDate = rawDataExtractedDate;
     }
 
@@ -160,7 +159,6 @@ public class RawDataDTO implements Serializable {
     public void setRawDataAnnotations(String rawDataAnnotations) {
         this.rawDataAnnotations = rawDataAnnotations;
     }
-
 
     @Override
     public boolean equals(Object o) {

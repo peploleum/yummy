@@ -2,7 +2,7 @@ package com.peploleum.insight.yummy.dto.entities;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -19,7 +19,7 @@ public class EventDTO implements Serializable {
 
     private EventType eventType;
 
-    private LocalDate eventDate;
+    private Instant eventDate;
 
     private String eventCoordinates;
 
@@ -60,11 +60,11 @@ public class EventDTO implements Serializable {
         this.eventType = eventType;
     }
 
-    public LocalDate getEventDate() {
+    public Instant getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(LocalDate eventDate) {
+    public void setEventDate(Instant eventDate) {
         this.eventDate = eventDate;
     }
 
