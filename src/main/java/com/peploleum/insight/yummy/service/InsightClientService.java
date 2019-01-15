@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -31,32 +32,41 @@ public class InsightClientService {
         this.cookies = this.getCookies();
     }
 
-    public void sendToInsight(Object entity) throws IOException {
+    public String sendToInsight(Object entity) throws IOException {
         this.log.debug("Sending Entity");
         if (this.cookies == null) {
             this.log.error("Anthentication failed. Object will not be sent.");
             throw new IOException("Authentication information not found.");
         }
         this.log.debug("Session cookie found");
-        this.doSend(entity);
+        final String id = this.doSend(entity);
+        return id;
     }
 
-
-    private void doSend(final Object dto) throws RestClientException {
+    private String doSend(final Object dto) throws RestClientException {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
-        final ResponseEntity<String> tResponseEntity;
+        final ResponseEntity<Object> tResponseEntity;
         try {
             final String insigthMethodUrl = InsightHttpUtils.getInsigthMethodUrl(dto);
             if (insigthMethodUrl.isEmpty()) {
                 this.log.warn("Failed to find endpoint for entity");
-                return;
+                return null;
             } else {
                 this.log.debug("Sending " + dto.toString());
             }
             tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, HttpMethod.POST,
-                    new HttpEntity<>(dto, headers), String.class);
-            log.debug("Received " + tResponseEntity);
+                    new HttpEntity<>(dto, headers), Object.class);
+            try {
+                log.debug("Received " + tResponseEntity);
+                final LinkedHashMap body = (LinkedHashMap) tResponseEntity.getBody();
+                final String id = (String) body.get("id");
+                return id;
+            } catch (Exception e) {
+                this.log.warn("Failed to send entity");
+                this.log.debug(e.getMessage(), e);
+                throw e;
+            }
         } catch (RestClientException e) {
             this.log.warn("Failed to send entity");
             this.log.debug(e.getMessage(), e);
@@ -73,7 +83,6 @@ public class InsightClientService {
         try {
             forEntity = rt.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
             log.debug("Received " + forEntity);
-
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException.Unauthorized) {
                 log.debug("Unauthorized. Need to retrieve session cookie for future requests.");
@@ -113,7 +122,6 @@ public class InsightClientService {
             log.error(e.getMessage(), e);
             return null;
         }
-
     }
 
     private List<String> getCookies() {

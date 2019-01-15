@@ -2,6 +2,7 @@ package com.peploleum.insight.yummy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
+import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
@@ -91,9 +92,16 @@ public class YummyApplicationTests {
     @Test
     public void insightPostmanTest() throws IOException {
         final RawDataDTO rawDataDTO = new RawDataDTO();
+        rawDataDTO.setRawDataName("test");
         rawDataDTO.setRawDataContent("test");
         rawDataDTO.setRawDataCreationDate(Instant.now());
-        this.insightClientService.sendToInsight(rawDataDTO);
+        final BiographicsDTO biographicsDTO = new BiographicsDTO();
+        biographicsDTO.setBiographicsFirstname("testFirstName");
+        biographicsDTO.setBiographicsName("testName");
+        final String idRawData = this.insightClientService.sendToInsight(rawDataDTO);
+        final String idBio = this.insightClientService.sendToInsight(biographicsDTO);
+        Assert.assertNotNull(idRawData);
+        Assert.assertNotNull(idBio);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.peploleum.insight.yummy.service;
 
+import com.peploleum.insight.yummy.dto.entities.graphy.RelationDTO;
 import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,32 @@ public class GraphyClientService {
         this.doSend(entity);
     }
 
+    public void sendRelationToGraphy(String idSource, String idTarget, String sourceType, String targetType) throws IOException {
+        this.log.debug("Sending relation " + idSource + " to " + idTarget + " typeSource: " + sourceType + " typeTarget: " + targetType);
+        this.doSendRelation(idSource, idTarget, sourceType, targetType);
+    }
+
+    private void doSendRelation(String idSource, String idTarget, String sourceType, String targetType) {
+        final RelationDTO relationDTO = new RelationDTO();
+        relationDTO.setIdJanusSource(idSource);
+        relationDTO.setIdJanusCible(idTarget);
+        relationDTO.setName("linked to");
+        relationDTO.setTypeSource(sourceType);
+        relationDTO.setTypeCible(targetType);
+
+        final RestTemplate rt = new RestTemplate();
+        final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
+        final ResponseEntity<String> tResponseEntity;
+        try {
+            tResponseEntity = rt.exchange("http://" + this.graphHost + ":" + this.graphPort + "/api/relation", HttpMethod.POST,
+                    new HttpEntity<>(relationDTO, headers), String.class);
+            log.debug("Received " + tResponseEntity);
+        } catch (RestClientException e) {
+            this.log.warn("Failed to send entity");
+            this.log.debug(e.getMessage(), e);
+            throw e;
+        }
+    }
 
     private void doSend(final Object dto) throws RestClientException {
         final RestTemplate rt = new RestTemplate();
@@ -46,7 +73,7 @@ public class GraphyClientService {
             } else {
                 this.log.debug("Sending " + dto.toString());
             }
-            tResponseEntity = rt.exchange("http://" + this.graphHost + ":" + this.graphHost + insigthMethodUrl, HttpMethod.POST,
+            tResponseEntity = rt.exchange("http://" + this.graphHost + ":" + this.graphPort + "/api/" + insigthMethodUrl, HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
             log.debug("Received " + tResponseEntity);
         } catch (RestClientException e) {
