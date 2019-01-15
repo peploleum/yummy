@@ -2,10 +2,10 @@ package com.peploleum.insight.yummy.service.utils;
 
 import com.peploleum.insight.yummy.dto.Entity;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
-import com.peploleum.insight.yummy.dto.entities.LocationDTO;
-import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
-import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.OrganisationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 
 import java.time.Instant;
@@ -45,13 +45,23 @@ public class NerResponseHandler {
     private List<Object> buildResponseEntities() {
         if (this.nerResponse == null || this.nerResponse.getEntities() == null)
             return new ArrayList<>();
-        List<Object> insightEntities = this.nerResponse.getEntities().values().stream()
-                .map(dto -> mapToEntityDto(dto)).filter(dto -> dto != null)
-                .collect(Collectors.toList());
+        final List<Object> insightEntities = extractInsightEntites(this.nerResponse);
         return insightEntities;
     }
 
-    private Object mapToEntityDto(Entity entity) {
+    public static List<Object> extractInsightEntites(final NerJsonObjectResponse response) {
+        return response.getEntities().values().stream()
+                .map(dto -> mapToInsightEntityDto(dto)).filter(dto -> dto != null)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Object> extractGraphyEntites(final NerJsonObjectResponse response) {
+        return response.getEntities().values().stream()
+                .map(dto -> mapToGraphytEntityDto(dto)).filter(dto -> dto != null)
+                .collect(Collectors.toList());
+    }
+
+    private static Object mapToInsightEntityDto(Entity entity) {
         switch (entity.getType()) {
             case LOCATION:
             case LOC:
@@ -68,6 +78,28 @@ public class NerResponseHandler {
                 final BiographicsDTO biographicsDTO = new BiographicsDTO();
                 biographicsDTO.setBiographicsName(entity.getText());
                 biographicsDTO.setBiographicsFirstname(" ");
+                return biographicsDTO;
+            default:
+                return null;
+        }
+    }
+
+    private static Object mapToGraphytEntityDto(Entity entity) {
+        switch (entity.getType()) {
+            case LOCATION:
+            case LOC:
+                final com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO locationDTO = new com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO();
+                locationDTO.setName(entity.getText());
+                return locationDTO;
+            case ORGANIZATION:
+            case ORG:
+                final com.peploleum.insight.yummy.dto.entities.graphy.OrganisationDTO organisationDTO = new com.peploleum.insight.yummy.dto.entities.graphy.OrganisationDTO();
+                organisationDTO.setName(entity.getText());
+                return organisationDTO;
+            case PERSON:
+            case PER:
+                final com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO biographicsDTO = new com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO();
+                biographicsDTO.setName(entity.getText());
                 return biographicsDTO;
             default:
                 return null;

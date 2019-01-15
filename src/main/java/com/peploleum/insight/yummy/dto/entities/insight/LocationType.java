@@ -1,4 +1,4 @@
-package com.peploleum.insight.yummy.dto.entities;
+package com.peploleum.insight.yummy.dto.entities.insight;
 
 /**
  * The LocationType enumeration.

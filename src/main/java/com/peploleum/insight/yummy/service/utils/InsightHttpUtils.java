@@ -1,9 +1,9 @@
 package com.peploleum.insight.yummy.service.utils;
 
-import com.peploleum.insight.yummy.dto.entities.RawDataDTO;
-import com.peploleum.insight.yummy.dto.entities.BiographicsDTO;
-import com.peploleum.insight.yummy.dto.entities.LocationDTO;
-import com.peploleum.insight.yummy.dto.entities.OrganisationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.OrganisationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -24,6 +24,14 @@ public class InsightHttpUtils {
         }
         return headers;
     }
+
+    public static HttpHeaders getBasicHeaders() {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        return headers;
+    }
+
 
     public static String getInsigthMethodUrl(Object o) {
         if (o instanceof BiographicsDTO) {

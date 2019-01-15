@@ -1,4 +1,4 @@
-package com.peploleum.insight.yummy.dto.entities;
+package com.peploleum.insight.yummy.dto.entities.insight;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
