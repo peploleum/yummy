@@ -144,14 +144,14 @@ public class NerClientService {
                         com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO graphyBiographicsDTO = new com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO();
                         graphyBiographicsDTO.setName(((BiographicsDTO) o).getBiographicsName());
                         graphyBiographicsDTO.setIdMongo(objectId);
-                        final String targetId = this.graphyClientService.sendToGraphy(objectId);
+                        final String targetId = this.graphyClientService.sendToGraphy(graphyBiographicsDTO);
                         this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Biographics.toString());
                     }
                     if (o instanceof LocationDTO) {
                         com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO graphyLocationDTO = new com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO();
                         graphyLocationDTO.setName(((BiographicsDTO) o).getBiographicsName());
                         graphyLocationDTO.setIdMongo(objectId);
-                        final String targetId = this.graphyClientService.sendToGraphy(objectId);
+                        final String targetId = this.graphyClientService.sendToGraphy(graphyLocationDTO);
                         this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Location.toString());
                     }
                 } catch (Exception e) {
