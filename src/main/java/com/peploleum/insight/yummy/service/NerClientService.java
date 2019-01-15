@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
+import com.peploleum.insight.yummy.dto.entities.graphy.Type;
+import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.rss.Item;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
@@ -36,6 +40,12 @@ public class NerClientService {
 
     @Value("${ner}")
     private boolean useNer;
+
+    @Value("${graph.enabled}")
+    private boolean useGraph;
+
+    @Autowired
+    private GraphyClientService graphyClientService;
 
     @Autowired
     private InsightClientService insightClientService;
@@ -110,11 +120,44 @@ public class NerClientService {
     private void submitInsightRequest(SimpleRawData simpleRawData, NerJsonObjectResponse nerObjectResponse) throws IOException {
         final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, simpleRawData);
         log.info("Sending raw data to Insight");
-        this.insightClientService.sendToInsight(responseHandler.getRawDataDto());
+        final RawDataDTO rawDataDto = responseHandler.getRawDataDto();
+        final String rawDataId = this.insightClientService.sendToInsight(rawDataDto);
+        String graphySourceId = null;
+        if (useGraph) {
+            try {
+                final com.peploleum.insight.yummy.dto.entities.graphy.RawDataDTO rawDataGraphDTO = new com.peploleum.insight.yummy.dto.entities.graphy.RawDataDTO();
+                rawDataGraphDTO.setIdMongo(rawDataId);
+                rawDataGraphDTO.setType("RawData");
+                rawDataGraphDTO.setName(rawDataDto.getRawDataName());
+                graphySourceId = this.graphyClientService.sendToGraphy(rawDataGraphDTO);
+            } catch (IOException e) {
+                this.log.error("Failed to write in Grpahy", e.getMessage());
+            }
+        }
         final List<Object> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
         for (Object o : insightEntities) {
-            this.insightClientService.sendToInsight(o);
+            final String objectId = this.insightClientService.sendToInsight(o);
+            if (useGraph && graphySourceId != null) {
+                try {
+                    if (o instanceof BiographicsDTO) {
+                        com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO graphyBiographicsDTO = new com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO();
+                        graphyBiographicsDTO.setName(((BiographicsDTO) o).getBiographicsName());
+                        graphyBiographicsDTO.setIdMongo(objectId);
+                        final String targetId = this.graphyClientService.sendToGraphy(objectId);
+                        this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Biographics.toString());
+                    }
+                    if (o instanceof LocationDTO) {
+                        com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO graphyLocationDTO = new com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO();
+                        graphyLocationDTO.setName(((BiographicsDTO) o).getBiographicsName());
+                        graphyLocationDTO.setIdMongo(objectId);
+                        final String targetId = this.graphyClientService.sendToGraphy(objectId);
+                        this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Location.toString());
+                    }
+                } catch (Exception e) {
+                    this.log.error("Failed to write in Grpahy", e.getMessage());
+                }
+            }
         }
     }
 }

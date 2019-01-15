@@ -46,6 +46,20 @@ public class InsightHttpUtils {
             return "";
         }
     }
+    public static String getGraphyEndpointUrl(Object o) {
+        if (o instanceof com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO) {
+            return "biographics";
+        } else if (o instanceof com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO) {
+            return "locations";
+        } else if (o instanceof com.peploleum.insight.yummy.dto.entities.graphy.OrganisationDTO) {
+            return "organisations";
+        } else if (o instanceof com.peploleum.insight.yummy.dto.entities.graphy.RawDataDTO) {
+            return "rawdata";
+        } else {
+            return "";
+        }
+    }
+
 
     public static String extractXsrf(final List<String> cookies) {
         for (String cookie : cookies) {

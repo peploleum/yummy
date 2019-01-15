@@ -29,9 +29,9 @@ public class GraphyClientService {
 
     private final Logger log = LoggerFactory.getLogger(GraphyClientService.class);
 
-    public void sendToGraphy(Object entity) throws IOException {
+    public String sendToGraphy(Object entity) throws IOException {
         this.log.debug("Sending Entity " + entity);
-        this.doSend(entity);
+        return this.doSend(entity);
     }
 
     public void sendRelationToGraphy(String idSource, String idTarget, String sourceType, String targetType) throws IOException {
@@ -39,7 +39,7 @@ public class GraphyClientService {
         this.doSendRelation(idSource, idTarget, sourceType, targetType);
     }
 
-    private void doSendRelation(String idSource, String idTarget, String sourceType, String targetType) {
+    private String doSendRelation(String idSource, String idTarget, String sourceType, String targetType) {
         final RelationDTO relationDTO = new RelationDTO();
         relationDTO.setIdJanusSource(idSource);
         relationDTO.setIdJanusCible(idTarget);
@@ -53,7 +53,8 @@ public class GraphyClientService {
         try {
             tResponseEntity = rt.exchange("http://" + this.graphHost + ":" + this.graphPort + "/api/relation", HttpMethod.POST,
                     new HttpEntity<>(relationDTO, headers), String.class);
-            log.debug("Received " + tResponseEntity);
+            log.debug("Received " + tResponseEntity.getBody());
+            return tResponseEntity.getBody();
         } catch (RestClientException e) {
             this.log.warn("Failed to send entity");
             this.log.debug(e.getMessage(), e);
@@ -61,21 +62,22 @@ public class GraphyClientService {
         }
     }
 
-    private void doSend(final Object dto) throws RestClientException {
+    private String doSend(final Object dto) throws RestClientException {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
         final ResponseEntity<String> tResponseEntity;
         try {
-            final String insigthMethodUrl = InsightHttpUtils.getInsigthMethodUrl(dto);
+            final String insigthMethodUrl = InsightHttpUtils.getGraphyEndpointUrl(dto);
             if (insigthMethodUrl.isEmpty()) {
                 this.log.warn("Failed to find endpoint for entity");
-                return;
+                return null;
             } else {
                 this.log.debug("Sending " + dto.toString());
             }
             tResponseEntity = rt.exchange("http://" + this.graphHost + ":" + this.graphPort + "/api/" + insigthMethodUrl, HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
-            log.debug("Received " + tResponseEntity);
+            log.debug("Received " + tResponseEntity.getBody());
+            return tResponseEntity.getBody();
         } catch (RestClientException e) {
             this.log.warn("Failed to send entity");
             this.log.debug(e.getMessage(), e);
