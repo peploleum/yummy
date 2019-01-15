@@ -32,7 +32,6 @@ public class InsightHttpUtils {
         return headers;
     }
 
-
     public static String getInsigthMethodUrl(Object o) {
         if (o instanceof BiographicsDTO) {
             return "biographics";
