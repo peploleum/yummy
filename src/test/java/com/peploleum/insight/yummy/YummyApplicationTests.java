@@ -75,7 +75,7 @@ public class YummyApplicationTests {
         final String content = nerJsonObjectResponse.getContent();
         Assert.assertNotNull(content);
         this.log.info(content);
-        final List<Object> objects = NerResponseHandler.extractGraphyEntites(nerJsonObjectResponse);
+        final List<Object> objects = NerResponseHandler.extractInsightEntites(nerJsonObjectResponse);
         for (final Object object : objects) {
             this.log.info(object.toString());
         }
