@@ -121,38 +121,39 @@ public class NerClientService {
         final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, simpleRawData);
         log.info("Sending raw data to Insight");
         final RawDataDTO rawDataDto = responseHandler.getRawDataDto();
-        final String rawDataId = this.insightClientService.sendToInsight(rawDataDto);
+
         String graphySourceId = null;
         if (useGraph) {
             try {
-                final com.peploleum.insight.yummy.dto.entities.graphy.RawDataDTO rawDataGraphDTO = new com.peploleum.insight.yummy.dto.entities.graphy.RawDataDTO();
-                rawDataGraphDTO.setIdMongo(rawDataId);
-                rawDataGraphDTO.setType("RawData");
-                rawDataGraphDTO.setName(rawDataDto.getRawDataName());
-                graphySourceId = this.graphyClientService.sendToGraphy(rawDataGraphDTO);
+                graphySourceId = this.graphyClientService.sendToGraphy(rawDataDto);
             } catch (IOException e) {
                 this.log.error("Failed to write in Grpahy", e.getMessage());
             }
         }
+        if (graphySourceId != null && useGraph) {
+            rawDataDto.setExternalId(graphySourceId);
+        }
+        final String rawDataId = this.insightClientService.sendToInsight(rawDataDto);
+        log.info("Sent raw data " + rawDataId + " to Insight  ");
         final List<Object> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
         for (Object o : insightEntities) {
-            final String objectId = this.insightClientService.sendToInsight(o);
+
             if (useGraph && graphySourceId != null) {
                 try {
                     if (o instanceof BiographicsDTO) {
-                        com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO graphyBiographicsDTO = new com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO();
-                        graphyBiographicsDTO.setName(((BiographicsDTO) o).getBiographicsName());
-                        graphyBiographicsDTO.setIdMongo(objectId);
-                        final String targetId = this.graphyClientService.sendToGraphy(graphyBiographicsDTO);
+                        final String targetId = this.graphyClientService.sendToGraphy(o);
                         this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Biographics.toString());
+                        ((BiographicsDTO) o).setExternalId(targetId);
+                        final String objectId = this.insightClientService.sendToInsight(o);
+                        this.log.info("Created Insight Entity with id: " + objectId);
                     }
                     if (o instanceof LocationDTO) {
-                        com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO graphyLocationDTO = new com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO();
-                        graphyLocationDTO.setName(((BiographicsDTO) o).getBiographicsName());
-                        graphyLocationDTO.setIdMongo(objectId);
-                        final String targetId = this.graphyClientService.sendToGraphy(graphyLocationDTO);
+                        final String targetId = this.graphyClientService.sendToGraphy(o);
                         this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Location.toString());
+                        ((LocationDTO) o).setExternalId(targetId);
+                        final String objectId = this.insightClientService.sendToInsight(o);
+                        this.log.info("Created Insight Entity with id: " + objectId);
                     }
                 } catch (Exception e) {
                     this.log.error("Failed to write in Grpahy", e.getMessage());

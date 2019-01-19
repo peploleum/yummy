@@ -1,4 +1,4 @@
-package com.peploleum.insight.yummy.dto.entities.graphy;
+package com.peploleum.insight.yummy.dto.entities.insight;
 
 public class RelationDTO {
 

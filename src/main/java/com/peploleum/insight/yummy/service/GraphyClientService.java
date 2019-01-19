@@ -1,6 +1,6 @@
 package com.peploleum.insight.yummy.service;
 
-import com.peploleum.insight.yummy.dto.entities.graphy.RelationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.RelationDTO;
 import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class GraphyClientService {
         final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
         final ResponseEntity<String> tResponseEntity;
         try {
-            final String insigthMethodUrl = InsightHttpUtils.getGraphyEndpointUrl(dto);
+            final String insigthMethodUrl = InsightHttpUtils.getInsigthMethodUrl(dto);
             if (insigthMethodUrl.isEmpty()) {
                 this.log.warn("Failed to find endpoint for entity");
                 return null;

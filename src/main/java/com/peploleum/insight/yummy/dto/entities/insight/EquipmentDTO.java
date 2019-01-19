@@ -25,6 +25,8 @@ public class EquipmentDTO implements Serializable {
     private byte[] equipmentImage;
     private String equipmentImageContentType;
 
+    private String externalId;
+
     public String getId() {
         return id;
     }
@@ -89,6 +91,14 @@ public class EquipmentDTO implements Serializable {
         this.equipmentImageContentType = equipmentImageContentType;
     }
 
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -120,6 +130,7 @@ public class EquipmentDTO implements Serializable {
             ", equipmentCoordinates='" + getEquipmentCoordinates() + "'" +
             ", equipmentSymbol='" + getEquipmentSymbol() + "'" +
             ", equipmentImage='" + getEquipmentImage() + "'" +
+            ", externalId='" + getExternalId() + "'" +
             "}";
     }
 }

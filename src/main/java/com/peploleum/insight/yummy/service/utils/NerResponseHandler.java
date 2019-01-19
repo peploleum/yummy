@@ -55,12 +55,6 @@ public class NerResponseHandler {
                 .collect(Collectors.toList());
     }
 
-    public static List<Object> extractGraphyEntites(final NerJsonObjectResponse response) {
-        return response.getEntities().values().stream()
-                .map(dto -> mapToGraphytEntityDto(dto)).filter(dto -> dto != null)
-                .collect(Collectors.toList());
-    }
-
     private static Object mapToInsightEntityDto(Entity entity) {
         switch (entity.getType()) {
             case LOCATION:
@@ -78,28 +72,6 @@ public class NerResponseHandler {
                 final BiographicsDTO biographicsDTO = new BiographicsDTO();
                 biographicsDTO.setBiographicsName(entity.getText());
                 biographicsDTO.setBiographicsFirstname(" ");
-                return biographicsDTO;
-            default:
-                return null;
-        }
-    }
-
-    private static Object mapToGraphytEntityDto(Entity entity) {
-        switch (entity.getType()) {
-            case LOCATION:
-            case LOC:
-                final com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO locationDTO = new com.peploleum.insight.yummy.dto.entities.graphy.LocationDTO();
-                locationDTO.setName(entity.getText());
-                return locationDTO;
-            case ORGANIZATION:
-            case ORG:
-                final com.peploleum.insight.yummy.dto.entities.graphy.OrganisationDTO organisationDTO = new com.peploleum.insight.yummy.dto.entities.graphy.OrganisationDTO();
-                organisationDTO.setName(entity.getText());
-                return organisationDTO;
-            case PERSON:
-            case PER:
-                final com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO biographicsDTO = new com.peploleum.insight.yummy.dto.entities.graphy.BiographicsDTO();
-                biographicsDTO.setName(entity.getText());
                 return biographicsDTO;
             default:
                 return null;
