@@ -12,8 +12,6 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.IOException;
-
 @Configuration
 @EnableBinding(value = {Sink.class})
 public class RawDataSink {
@@ -32,7 +30,7 @@ public class RawDataSink {
                 final TwitterSourceMessage twitterSourceMessage = mapperObj.readValue(message, TwitterSourceMessage.class);
                 log.info("Sucessfully parsed TwitterMessage.");
                 this.nerService.doSend(twitterSourceMessage);
-            } catch (IOException e1) {
+            } catch (Exception e1) {
                 this.log.error(e1.getMessage(), e1);
             }
         } else {
@@ -43,7 +41,7 @@ public class RawDataSink {
                 if (!success) {
                     log.warn("Failed to process message : " + message);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }
