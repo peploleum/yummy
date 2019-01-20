@@ -7,8 +7,8 @@ import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
-import com.peploleum.insight.yummy.service.InsightClientService;
-import com.peploleum.insight.yummy.service.NerClientService;
+import com.peploleum.insight.yummy.service.InsightService;
+import com.peploleum.insight.yummy.service.NerService;
 import com.peploleum.insight.yummy.service.utils.NerResponseHandler;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,10 +33,10 @@ public class YummyApplicationTests {
     private final Logger log = LoggerFactory.getLogger(YummyApplicationTests.class);
 
     @Autowired
-    private NerClientService nerClientService;
+    private NerService nerService;
 
     @Autowired
-    private InsightClientService insightClientService;
+    private InsightService insightClientService;
 
 
     @Test
@@ -71,7 +71,7 @@ public class YummyApplicationTests {
         final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample_twitter.json");
         final TwitterSourceMessage twitterSourceMessage = mapper.readValue(resourceAsStream, TwitterSourceMessage.class);
         final SimpleRawData simpleRawData = SimpleRawData.fromTwitterSourceMessage(twitterSourceMessage);
-        final NerJsonObjectResponse nerJsonObjectResponse = this.nerClientService.submitNerRequest(simpleRawData);
+        final NerJsonObjectResponse nerJsonObjectResponse = this.nerService.submitNerRequest(simpleRawData);
         final String content = nerJsonObjectResponse.getContent();
         Assert.assertNotNull(content);
         this.log.info(content);
@@ -86,7 +86,7 @@ public class YummyApplicationTests {
         final ObjectMapper mapper = new ObjectMapper();
         final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample.json");
         final RssSourceMessage mess = mapper.readValue(resourceAsStream, RssSourceMessage.class);
-        this.nerClientService.doSend(mess);
+        this.nerService.doSend(mess);
     }
 
     @Test

@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 
 @Service
-public class GraphyClientService {
+public class GraphyService {
 
     @Value("${graph.enabled}")
     private boolean graphEnabled;
@@ -27,7 +27,7 @@ public class GraphyClientService {
     @Value("${graph.port}")
     private int graphPort;
 
-    private final Logger log = LoggerFactory.getLogger(GraphyClientService.class);
+    private final Logger log = LoggerFactory.getLogger(GraphyService.class);
 
     public String sendToGraphy(Object entity) throws IOException {
         this.log.debug("Sending Entity " + entity);

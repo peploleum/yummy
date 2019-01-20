@@ -19,12 +19,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
-public class InsightClientService {
+public class InsightService {
 
     @Value("${urlinsight}")
     private String urlinsight;
 
-    private final Logger log = LoggerFactory.getLogger(InsightClientService.class);
+    private final Logger log = LoggerFactory.getLogger(InsightService.class);
     private List<String> cookies;
 
     @PostConstruct

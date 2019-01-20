@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class NerClientService {
+public class NerService {
 
     @Value("${urlner}")
     private String urlner;
@@ -45,15 +45,15 @@ public class NerClientService {
     private boolean useGraph;
 
     @Autowired
-    private GraphyClientService graphyClientService;
+    private GraphyService graphyService;
 
     @Autowired
-    private InsightClientService insightClientService;
+    private InsightService insightClientService;
 
-    private final Logger log = LoggerFactory.getLogger(NerClientService.class);
+    private final Logger log = LoggerFactory.getLogger(NerService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
 
-    public NerClientService() {
+    public NerService() {
         this.mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
@@ -125,7 +125,7 @@ public class NerClientService {
         String graphySourceId = null;
         if (useGraph) {
             try {
-                graphySourceId = this.graphyClientService.sendToGraphy(rawDataDto);
+                graphySourceId = this.graphyService.sendToGraphy(rawDataDto);
             } catch (IOException e) {
                 this.log.error("Failed to write in Grpahy", e.getMessage());
             }
@@ -142,15 +142,15 @@ public class NerClientService {
             if (useGraph && graphySourceId != null) {
                 try {
                     if (o instanceof BiographicsDTO) {
-                        final String targetId = this.graphyClientService.sendToGraphy(o);
-                        this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Biographics.toString());
+                        final String targetId = this.graphyService.sendToGraphy(o);
+                        this.graphyService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Biographics.toString());
                         ((BiographicsDTO) o).setExternalId(targetId);
                         final String objectId = this.insightClientService.sendToInsight(o);
                         this.log.info("Created Insight Entity with id: " + objectId);
                     }
                     if (o instanceof LocationDTO) {
-                        final String targetId = this.graphyClientService.sendToGraphy(o);
-                        this.graphyClientService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Location.toString());
+                        final String targetId = this.graphyService.sendToGraphy(o);
+                        this.graphyService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Location.toString());
                         ((LocationDTO) o).setExternalId(targetId);
                         final String objectId = this.insightClientService.sendToInsight(o);
                         this.log.info("Created Insight Entity with id: " + objectId);
