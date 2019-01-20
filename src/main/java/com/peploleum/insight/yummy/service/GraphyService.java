@@ -13,11 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 @Service
 public class GraphyService {
 
+    private String apiRootUrl;
     @Value("${graph.enabled}")
     private boolean graphEnabled;
 
@@ -29,17 +32,44 @@ public class GraphyService {
 
     private final Logger log = LoggerFactory.getLogger(GraphyService.class);
 
-    public String sendToGraphy(Object entity) throws IOException {
+    public GraphyService() {
+    }
+
+    @PostConstruct
+    public void setup() {
+        this.apiRootUrl = "http://" + this.graphHost + ":" + this.graphPort + "/api/";
+    }
+
+    public String create(Object entity) throws RestClientException {
         this.log.debug("Sending Entity " + entity);
         return this.doSend(entity);
     }
 
-    public void sendRelationToGraphy(String idSource, String idTarget, String sourceType, String targetType) throws IOException {
+    public void sendRelationToGraphy(String idSource, String idTarget, String sourceType, String targetType) throws RestClientException {
         this.log.debug("Sending relation " + idSource + " to " + idTarget + " typeSource: " + sourceType + " typeTarget: " + targetType);
         this.doSendRelation(idSource, idTarget, sourceType, targetType);
     }
 
-    private String doSendRelation(String idSource, String idTarget, String sourceType, String targetType) {
+
+    public void createRelation(Object sourceDTO, Object targetDTO) throws Exception {
+        try {
+            final Object sourceExternalIdValue = extractFieldValue(sourceDTO);
+            final Object targetExternalIdValue = extractFieldValue(targetDTO);
+            this.doSendRelation(sourceExternalIdValue.toString(), targetExternalIdValue.toString(), TypeResolver.resolve(sourceDTO), TypeResolver.resolve(targetDTO));
+        } catch (Exception e) {
+            this.log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    private Object extractFieldValue(Object dto) throws IllegalAccessException {
+        Field sourceExternalIdField = org.springframework.util.ReflectionUtils.findField(dto.getClass(), "externalId");
+        org.springframework.util.ReflectionUtils.makeAccessible(sourceExternalIdField);
+        return sourceExternalIdField.get(dto);
+    }
+
+    private String doSendRelation(String idSource, String idTarget, String sourceType, String targetType) throws RestClientException {
+        this.log.info("Creating relation between " + idSource + "/" + sourceType + " and " + idTarget + "/" + targetType);
         final RelationDTO relationDTO = new RelationDTO();
         relationDTO.setIdJanusSource(idSource);
         relationDTO.setIdJanusCible(idTarget);
@@ -51,7 +81,7 @@ public class GraphyService {
         final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
         final ResponseEntity<String> tResponseEntity;
         try {
-            tResponseEntity = rt.exchange("http://" + this.graphHost + ":" + this.graphPort + "/api/relation", HttpMethod.POST,
+            tResponseEntity = rt.exchange(this.apiRootUrl + "relation", HttpMethod.POST,
                     new HttpEntity<>(relationDTO, headers), String.class);
             log.debug("Received " + tResponseEntity.getBody());
             return tResponseEntity.getBody();
@@ -67,14 +97,14 @@ public class GraphyService {
         final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
         final ResponseEntity<String> tResponseEntity;
         try {
-            final String insigthMethodUrl = InsightHttpUtils.getInsigthMethodUrl(dto);
-            if (insigthMethodUrl.isEmpty()) {
+            final String graphyEnpointSuffix = InsightHttpUtils.getInsigthMethodUrl(dto);
+            if (graphyEnpointSuffix.isEmpty()) {
                 this.log.warn("Failed to find endpoint for entity");
                 return null;
-            } else {
-                this.log.debug("Sending " + dto.toString());
             }
-            tResponseEntity = rt.exchange("http://" + this.graphHost + ":" + this.graphPort + "/api/" + insigthMethodUrl, HttpMethod.POST,
+            final String url = this.apiRootUrl + graphyEnpointSuffix;
+            this.log.debug("Sending " + dto.toString() + " to " + url);
+            tResponseEntity = rt.exchange(url, HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
             log.debug("Received " + tResponseEntity.getBody());
             return tResponseEntity.getBody();
@@ -83,5 +113,11 @@ public class GraphyService {
             this.log.debug(e.getMessage(), e);
             throw e;
         }
+    }
+}
+
+class TypeResolver {
+    public static String resolve(Object object) {
+        return object.getClass().getSimpleName().substring(0, object.getClass().getSimpleName().length() - 3);
     }
 }

@@ -82,7 +82,7 @@ public class YummyApplicationTests {
     }
 
     @Test
-    public void rssMessageToNerToInsightTest() throws IOException {
+    public void rssMessageToNerToInsightTest() throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
         final InputStream resourceAsStream = YummyApplicationTests.class.getResourceAsStream("/sample.json");
         final RssSourceMessage mess = mapper.readValue(resourceAsStream, RssSourceMessage.class);
@@ -98,8 +98,8 @@ public class YummyApplicationTests {
         final BiographicsDTO biographicsDTO = new BiographicsDTO();
         biographicsDTO.setBiographicsFirstname("testFirstName");
         biographicsDTO.setBiographicsName("testName");
-        final String idRawData = this.insightClientService.sendToInsight(rawDataDTO);
-        final String idBio = this.insightClientService.sendToInsight(biographicsDTO);
+        final String idRawData = this.insightClientService.create(rawDataDTO);
+        final String idBio = this.insightClientService.create(biographicsDTO);
         Assert.assertNotNull(idRawData);
         Assert.assertNotNull(idBio);
     }
@@ -109,7 +109,7 @@ public class YummyApplicationTests {
         final RawDataDTO rawDataDTO = new RawDataDTO();
         rawDataDTO.setRawDataContent("test");
         rawDataDTO.setRawDataCreationDate(Instant.now());
-        this.insightClientService.sendToInsight(rawDataDTO);
+        this.insightClientService.create(rawDataDTO);
     }
 
 }

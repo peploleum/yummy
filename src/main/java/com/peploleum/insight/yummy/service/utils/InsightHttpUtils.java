@@ -1,9 +1,6 @@
 package com.peploleum.insight.yummy.service.utils;
 
-import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
-import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
-import com.peploleum.insight.yummy.dto.entities.insight.OrganisationDTO;
-import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -41,8 +38,12 @@ public class InsightHttpUtils {
             return "organisations";
         } else if (o instanceof RawDataDTO) {
             return "raw-data";
+        } else if (o instanceof EventDTO) {
+            return "events";
+        } else if (o instanceof EquipmentDTO) {
+            return "equipment";
         } else {
-            return "";
+            return null;
         }
     }
 

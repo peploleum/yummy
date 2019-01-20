@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.entities.graphy.Type;
-import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
-import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.rss.Item;
@@ -20,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class NerService {
         this.mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
-    public boolean doSend(final Object message) throws IOException {
+    public boolean doSend(final Object message) throws Exception {
         if (message instanceof RssSourceMessage) {
             try {
                 this.log.info("Processing RSS message");
@@ -76,11 +75,11 @@ public class NerService {
                     if (this.useNer) {
                         nerJsonObjectResponse = submitNerRequest(simpleRawData);
                     }
-                    submitInsightRequest(simpleRawData, nerJsonObjectResponse);
+                    createInRemoteServices(simpleRawData, nerJsonObjectResponse);
                     cpt++;
                 }
                 log.debug("Number of Items processed : " + cpt);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw e;
             }
@@ -93,7 +92,7 @@ public class NerService {
             if (this.useNer) {
                 nerJsonObjectResponse = submitNerRequest(simpleRawData);
             }
-            submitInsightRequest(simpleRawData, nerJsonObjectResponse);
+            createInRemoteServices(simpleRawData, nerJsonObjectResponse);
         }
         return true;
     }
@@ -117,48 +116,63 @@ public class NerService {
         return nerObjectResponse;
     }
 
-    private void submitInsightRequest(SimpleRawData simpleRawData, NerJsonObjectResponse nerObjectResponse) throws IOException {
+    private void createInRemoteServices(SimpleRawData simpleRawData, NerJsonObjectResponse nerObjectResponse) throws Exception {
         final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, simpleRawData);
         log.info("Sending raw data to Insight");
         final RawDataDTO rawDataDto = responseHandler.getRawDataDto();
 
         String graphySourceId = null;
+        final String rawDataId = this.insightClientService.create(rawDataDto);
+        rawDataDto.setId(rawDataId);
         if (useGraph) {
             try {
-                graphySourceId = this.graphyService.sendToGraphy(rawDataDto);
+                graphySourceId = this.graphyService.create(rawDataDto);
+                rawDataDto.setExternalId(graphySourceId);
+                this.insightClientService.update(rawDataDto);
+            } catch (RestClientException e) {
+                this.log.error("Failed to write in Graphy", e.getMessage());
+                throw e;
             } catch (IOException e) {
-                this.log.error("Failed to write in Grpahy", e.getMessage());
+                this.log.error("Failed to update in Insight", e.getMessage());
+                throw e;
             }
         }
-        if (graphySourceId != null && useGraph) {
-            rawDataDto.setExternalId(graphySourceId);
-        }
-        final String rawDataId = this.insightClientService.sendToInsight(rawDataDto);
         log.info("Sent raw data " + rawDataId + " to Insight  ");
         final List<Object> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
         for (Object o : insightEntities) {
-
             if (useGraph && graphySourceId != null) {
                 try {
-                    if (o instanceof BiographicsDTO) {
-                        final String targetId = this.graphyService.sendToGraphy(o);
-                        this.graphyService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Biographics.toString());
-                        ((BiographicsDTO) o).setExternalId(targetId);
-                        final String objectId = this.insightClientService.sendToInsight(o);
-                        this.log.info("Created Insight Entity with id: " + objectId);
-                    }
-                    if (o instanceof LocationDTO) {
-                        final String targetId = this.graphyService.sendToGraphy(o);
-                        this.graphyService.sendRelationToGraphy(graphySourceId, targetId, Type.RawData.toString(), Type.Location.toString());
-                        ((LocationDTO) o).setExternalId(targetId);
-                        final String objectId = this.insightClientService.sendToInsight(o);
-                        this.log.info("Created Insight Entity with id: " + objectId);
-                    }
+                    final String mongoId = this.insightClientService.create(o);
+                    setFieldValue(o, "id", mongoId);
+                    this.log.info("Created Insight Entity: " + o.toString());
+                    final String janusId = this.graphyService.create(o);
+                    setFieldValue(o, "external", janusId);
+                    this.log.info("Created Graphy Entity: " + o.toString());
+                    this.insightClientService.update(o);
+                    this.log.info("Updated Insight Entity: " + o.toString());
+                    this.graphyService.createRelation(rawDataDto, o);
                 } catch (Exception e) {
                     this.log.error("Failed to write in Grpahy", e.getMessage());
                 }
             }
         }
+        for (Object source : insightEntities) {
+            for (Object target : insightEntities) {
+                this.log.info("Creating relation between " + source + " and " + target);
+                try {
+                    this.graphyService.createRelation(source, target);
+                } catch (Exception e) {
+                    this.log.error("Failed to create relation in", e.getMessage());
+                    throw e;
+                }
+            }
+        }
+    }
+
+    private static void setFieldValue(Object dto, String fieldName, String externalIdValue) throws IllegalAccessException {
+        Field sourceExternalIdField = org.springframework.util.ReflectionUtils.findField(dto.getClass(), fieldName);
+        org.springframework.util.ReflectionUtils.makeAccessible(sourceExternalIdField);
+        sourceExternalIdField.set(dto, externalIdValue);
     }
 }

@@ -29,21 +29,32 @@ public class InsightService {
 
     @PostConstruct
     private void onConstruct() {
-        this.cookies = this.getCookies();
+        this.cookies = this.generateCookies();
     }
 
-    public String sendToInsight(Object entity) throws IOException {
+    public String create(Object entity) throws IOException {
+        this.log.debug("Creating Entity");
+        if (this.cookies == null) {
+            this.log.error("Anthentication failed. Object will not be sent.");
+            throw new IOException("Authentication information not found.");
+        }
+        this.log.debug("Session cookie found");
+        final String id = this.doSend(entity, HttpMethod.POST);
+        return id;
+    }
+
+    public String update(Object entity) throws IOException {
         this.log.debug("Sending Entity");
         if (this.cookies == null) {
             this.log.error("Anthentication failed. Object will not be sent.");
             throw new IOException("Authentication information not found.");
         }
         this.log.debug("Session cookie found");
-        final String id = this.doSend(entity);
+        final String id = this.doSend(entity, HttpMethod.PUT);
         return id;
     }
 
-    private String doSend(final Object dto) throws RestClientException {
+    private String doSend(final Object dto, final HttpMethod method) throws RestClientException {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         final ResponseEntity<Object> tResponseEntity;
@@ -55,7 +66,7 @@ public class InsightService {
             } else {
                 this.log.debug("Sending " + dto.toString());
             }
-            tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, HttpMethod.POST,
+            tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, method,
                     new HttpEntity<>(dto, headers), Object.class);
             try {
                 log.debug("Received " + tResponseEntity);
@@ -124,7 +135,7 @@ public class InsightService {
         }
     }
 
-    private List<String> getCookies() {
+    private List<String> generateCookies() {
         final String accountCookie = this.account();
         if (accountCookie == null)
             return null;
