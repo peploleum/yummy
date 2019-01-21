@@ -102,7 +102,7 @@ public class GraphyService {
                 return null;
             }
             final String url = this.apiRootUrl + graphyEnpointSuffix;
-            this.log.warn("Sending " + dto.toString() + " to " + url);
+            this.log.info("Sending object to " + url);
             tResponseEntity = rt.exchange(url, HttpMethod.POST,
                     new HttpEntity<>(dto, headers), String.class);
             log.debug("Received " + tResponseEntity.getBody());
