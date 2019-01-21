@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.entities.insight.*;
+import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.rss.Item;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
@@ -146,18 +146,18 @@ public class NerService {
         final List<Object> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
 
-        String coordonates=null;
+        String coordinates = null;
         try {
-            List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntities instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
-            for (String locationName:collect
-                    ) {
-                if(coordonates==null && locationName!=null)
-                {
-                    coordonates = RefGeoUtils.getRefGeoCoordonates(locationName, this.elasticSearchService);
+            final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntities instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
+            for (String locationName : collect) {
+                this.log.info("Found locationName: " + locationName);
+                if (coordinates == null && locationName != null) {
+                    coordinates = RefGeoUtils.getRefGeoCoordinates(locationName, this.elasticSearchService);
                 }
             }
-
-
+            if (coordinates == null) {
+                this.log.warn("Found no coordinates among " + collect.size() + " locations");
+            }
         } catch (Exception e) {
             this.log.error("Error While getting LocationName list", e);
         }
@@ -166,20 +166,19 @@ public class NerService {
             if (useGraph) {
                 try {
 
-                    if (coordonates!=null)
-                    {
+                    if (coordinates != null) {
                         if (o instanceof BiographicsDTO)
-                            setFieldValue(o, "biographicsCoordinates", coordonates);
+                            setFieldValue(o, "biographicsCoordinates", coordinates);
                         else if (o instanceof EquipmentDTO)
-                            setFieldValue(o, "equipmentCoordinates", coordonates);
+                            setFieldValue(o, "equipmentCoordinates", coordinates);
                         else if (o instanceof EventDTO)
-                            setFieldValue(o, "eventCoordinates", coordonates);
+                            setFieldValue(o, "eventCoordinates", coordinates);
                         else if (o instanceof LocationDTO)
-                            setFieldValue(o, "setLocationCoordinates", coordonates);
+                            setFieldValue(o, "setLocationCoordinates", coordinates);
                         else if (o instanceof OrganisationDTO)
-                            setFieldValue(o, "organisationCoordinates", coordonates);
+                            setFieldValue(o, "organisationCoordinates", coordinates);
                         else if (o instanceof RawDataDTO)
-                            setFieldValue(o, "rawDataCoordinates", coordonates);
+                            setFieldValue(o, "rawDataCoordinates", coordinates);
                     }
 
                     final String mongoId = this.insightClientService.create(o);

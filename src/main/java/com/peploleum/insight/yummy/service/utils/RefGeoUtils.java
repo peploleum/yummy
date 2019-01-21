@@ -3,7 +3,10 @@ package com.peploleum.insight.yummy.service.utils;
 import com.peploleum.insight.yummy.dto.source.elasticSearch.EsResponse;
 import com.peploleum.insight.yummy.dto.source.elasticSearch.EsSource;
 import com.peploleum.insight.yummy.service.ElasticSearchService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -12,19 +15,26 @@ import java.util.List;
  * et recuperer les coordonnées
  */
 public class RefGeoUtils {
+    private final static Logger log = LoggerFactory.getLogger(RefGeoUtils.class);
 
- /*   methode pour interroger le reférentiel géographique via ElasticSearchService
-  et recuperer les coordonnées de locationName*/
-    public static String getRefGeoCoordonates(String locationName, ElasticSearchService elasticSearchService) {
-        String coordonates = null;
+    /*   methode pour interroger le reférentiel géographique via ElasticSearchService
+     et recuperer les coordonnées de locationName*/
+    public static String getRefGeoCoordinates(String locationName, ElasticSearchService elasticSearchService) throws IOException {
+        log.info("Getting coordinates for " + locationName);
+        String coordinates = null;
         try {
             EsResponse reponse = elasticSearchService.submitElasticSearchRequest("locationName");
             List<EsSource> sourceList = reponse.getSourceList();
-            coordonates = sourceList.get(0).getLatitude() + "," + sourceList.get(0).getLongitude();
+            if (sourceList == null || sourceList.isEmpty()) {
+                return null;
+            }
+            log.info("Found source list " + sourceList.isEmpty() + " " + sourceList.size());
+            coordinates = sourceList.get(0).getLatitude() + "," + sourceList.get(0).getLongitude();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+            throw e;
         }
-        return coordonates;
+        return coordinates;
     }
 }
