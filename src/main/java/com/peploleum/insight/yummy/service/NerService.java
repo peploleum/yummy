@@ -151,6 +151,7 @@ public class NerService {
                     this.log.info("Created Graphy Entity: " + o.toString());
                     this.insightClientService.update(o);
                     this.log.info("Updated Insight Entity: " + o.toString());
+                    this.log.info("Creating relation between " + rawDataDto + " and " + o);
                     this.graphyService.createRelation(rawDataDto, o);
                 } catch (Exception e) {
                     this.log.error("Failed to write in Grpahy", e.getMessage());
