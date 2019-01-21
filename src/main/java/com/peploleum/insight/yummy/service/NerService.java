@@ -148,7 +148,7 @@ public class NerService {
 
         String coordinates = null;
         try {
-            final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntities instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
+            final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntity instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
             for (String locationName : collect) {
                 this.log.info("Found locationName: " + locationName);
                 if (coordinates == null && locationName != null) {
