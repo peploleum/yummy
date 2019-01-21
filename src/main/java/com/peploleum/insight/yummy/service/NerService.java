@@ -154,7 +154,7 @@ public class NerService {
                     this.log.info("Creating relation between " + rawDataDto + " and " + o);
                     this.graphyService.createRelation(rawDataDto, o);
                 } catch (Exception e) {
-                    this.log.error("Failed to write in Grpahy", e.getMessage());
+                    this.log.error("Failed to write in Grpahy", e);
                 }
             }
         }
