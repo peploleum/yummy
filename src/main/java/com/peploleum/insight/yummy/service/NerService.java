@@ -141,7 +141,7 @@ public class NerService {
         final List<Object> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
         for (Object o : insightEntities) {
-            if (useGraph && graphySourceId != null) {
+            if (useGraph) {
                 try {
                     final String mongoId = this.insightClientService.create(o);
                     setFieldValue(o, "id", mongoId);
