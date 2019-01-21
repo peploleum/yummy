@@ -151,16 +151,16 @@ public class NerService {
                     this.log.info("Created Graphy Entity: " + o.toString());
                     this.insightClientService.update(o);
                     this.log.info("Updated Insight Entity: " + o.toString());
-                    this.log.info("Creating relation between " + rawDataDto + " and " + o);
+                    this.log.info("Creating relation between " + getFieldValue(rawDataDto, "externalId") + " and " + getFieldValue(rawDataDto, "externalId"));
                     this.graphyService.createRelation(rawDataDto, o);
                 } catch (Exception e) {
-                    this.log.error("Failed to write in Grpahy", e);
+                    this.log.error("Failed to write in Graphy", e);
                 }
             }
         }
         for (Object source : insightEntities) {
             for (Object target : insightEntities) {
-                this.log.info("Creating relation between " + source + " and " + target);
+                this.log.info("Creating relation between " + getFieldValue(source, "externalId") + " and " + getFieldValue(target, "externalId"));
                 try {
                     this.graphyService.createRelation(source, target);
                 } catch (Exception e) {
@@ -175,5 +175,11 @@ public class NerService {
         Field sourceExternalIdField = org.springframework.util.ReflectionUtils.findField(dto.getClass(), fieldName);
         org.springframework.util.ReflectionUtils.makeAccessible(sourceExternalIdField);
         sourceExternalIdField.set(dto, externalIdValue);
+    }
+
+    private static String getFieldValue(Object dto, String fieldName) throws IllegalAccessException {
+        Field field = org.springframework.util.ReflectionUtils.findField(dto.getClass(), fieldName);
+        org.springframework.util.ReflectionUtils.makeAccessible(field);
+        return field.get(dto).toString();
     }
 }
