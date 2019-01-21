@@ -1,6 +1,7 @@
-package com.peploleum.insight.yummy.dto;
+package com.peploleum.insight.yummy.dto.source.ner;
 
 import com.fasterxml.jackson.annotation.*;
+import com.peploleum.insight.yummy.dto.source.ner.NerEntitiesType;
 
 import java.util.HashMap;
 import java.util.Map;

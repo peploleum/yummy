@@ -1,7 +1,7 @@
 package com.peploleum.insight.yummy.service.utils;
 
-import com.peploleum.insight.yummy.dto.Entity;
-import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
+import com.peploleum.insight.yummy.dto.source.ner.Entity;
+import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.OrganisationDTO;

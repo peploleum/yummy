@@ -1,4 +1,4 @@
-package com.peploleum.insight.yummy.dto;
+package com.peploleum.insight.yummy.dto.source.ner;
 
 /**
  * Created by gFolgoas on 21/12/2018.

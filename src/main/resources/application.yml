@@ -23,3 +23,7 @@ graph:
   enabled: true
   host: localhost
   port: 8090
+elasticsearch:
+  host: localhost
+  port: 9200
+  indexName: gazetter

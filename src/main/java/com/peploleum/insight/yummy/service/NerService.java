@@ -3,14 +3,15 @@ package com.peploleum.insight.yummy.service;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.peploleum.insight.yummy.dto.NerJsonObjectQuery;
-import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.*;
+import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectQuery;
+import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.rss.Item;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
 import com.peploleum.insight.yummy.service.utils.NerResponseHandler;
+import com.peploleum.insight.yummy.service.utils.RefGeoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NerService {
@@ -48,6 +50,9 @@ public class NerService {
 
     @Autowired
     private InsightService insightClientService;
+
+    @Autowired
+    private ElasticSearchService elasticSearchService;
 
     private final Logger log = LoggerFactory.getLogger(NerService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
@@ -140,9 +145,43 @@ public class NerService {
         log.info("Sent raw data " + rawDataId + " to Insight  ");
         final List<Object> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
+
+        String coordonates=null;
+        try {
+            List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntities instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
+            for (String locationName:collect
+                    ) {
+                if(coordonates==null && locationName!=null)
+                {
+                    coordonates = RefGeoUtils.getRefGeoCoordonates(locationName, this.elasticSearchService);
+                }
+            }
+
+
+        } catch (Exception e) {
+            this.log.error("Error While getting LocationName list", e);
+        }
+
         for (Object o : insightEntities) {
             if (useGraph) {
                 try {
+
+                    if (coordonates!=null)
+                    {
+                        if (o instanceof BiographicsDTO)
+                            setFieldValue(o, "biographicsCoordinates", coordonates);
+                        else if (o instanceof EquipmentDTO)
+                            setFieldValue(o, "equipmentCoordinates", coordonates);
+                        else if (o instanceof EventDTO)
+                            setFieldValue(o, "eventCoordinates", coordonates);
+                        else if (o instanceof LocationDTO)
+                            setFieldValue(o, "setLocationCoordinates", coordonates);
+                        else if (o instanceof OrganisationDTO)
+                            setFieldValue(o, "organisationCoordinates", coordonates);
+                        else if (o instanceof RawDataDTO)
+                            setFieldValue(o, "rawDataCoordinates", coordonates);
+                    }
+
                     final String mongoId = this.insightClientService.create(o);
                     setFieldValue(o, "id", mongoId);
                     this.log.info("Created Insight Entity: " + o.toString());
