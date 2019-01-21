@@ -147,7 +147,7 @@ public class NerService {
                     setFieldValue(o, "id", mongoId);
                     this.log.info("Created Insight Entity: " + o.toString());
                     final String janusId = this.graphyService.create(o);
-                    setFieldValue(o, "external", janusId);
+                    setFieldValue(o, "externalId", janusId);
                     this.log.info("Created Graphy Entity: " + o.toString());
                     this.insightClientService.update(o);
                     this.log.info("Updated Insight Entity: " + o.toString());
