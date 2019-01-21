@@ -28,7 +28,7 @@ public class ElasticSearchService {
 
     @Value("${elasticsearch.port}")
     private String elasticsearchPort;
-    @Value("${elasticsearch.index}")
+    @Value("${elasticsearch.index-name}")
     private String elasticsearchIndex;
 
     private final Logger log = LoggerFactory.getLogger(ElasticSearchService.class);

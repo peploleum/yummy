@@ -26,4 +26,4 @@ graph:
 elasticsearch:
   host: localhost
   port: 9200
-  indexName: gazetter
+  index-name: gazetter
