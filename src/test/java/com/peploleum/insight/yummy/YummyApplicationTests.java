@@ -1,10 +1,10 @@
 package com.peploleum.insight.yummy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.peploleum.insight.yummy.dto.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
+import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
 import com.peploleum.insight.yummy.service.InsightService;
