@@ -45,6 +45,9 @@ public class NerService {
     @Value("${graph.enabled}")
     private boolean useGraph;
 
+    @Value("${elasticsearch.enabled}")
+    private boolean useElasticSearch;
+
     @Autowired
     private GraphyService graphyService;
 
@@ -147,25 +150,26 @@ public class NerService {
         log.info("Sending " + insightEntities.size() + " entities to Insight");
 
         String coordinates = null;
-        try {
-            final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntity instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
-            for (String locationName : collect) {
-                this.log.info("Found locationName: " + locationName);
-                if (coordinates == null && locationName != null) {
-                    coordinates = RefGeoUtils.getRefGeoCoordinates(locationName, this.elasticSearchService);
+        if (this.useElasticSearch) {
+            try {
+                final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntity instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
+                for (String locationName : collect) {
+                    this.log.info("Found locationName: " + locationName);
+                    if (coordinates == null && locationName != null) {
+                        coordinates = RefGeoUtils.getRefGeoCoordinates(locationName, this.elasticSearchService);
+                    }
                 }
+                if (coordinates == null) {
+                    this.log.warn("Found no coordinates among " + collect.size() + " locations");
+                }
+            } catch (Exception e) {
+                this.log.error("Error While getting LocationName list", e);
             }
-            if (coordinates == null) {
-                this.log.warn("Found no coordinates among " + collect.size() + " locations");
-            }
-        } catch (Exception e) {
-            this.log.error("Error While getting LocationName list", e);
         }
 
         for (Object o : insightEntities) {
             if (useGraph) {
                 try {
-
                     if (coordinates != null) {
                         if (o instanceof BiographicsDTO)
                             setFieldValue(o, "biographicsCoordinates", coordinates);
@@ -180,7 +184,6 @@ public class NerService {
                         else if (o instanceof RawDataDTO)
                             setFieldValue(o, "rawDataCoordinates", coordinates);
                     }
-
                     final String mongoId = this.insightClientService.create(o);
                     setFieldValue(o, "id", mongoId);
                     this.log.info("Created Insight Entity: " + o.toString());

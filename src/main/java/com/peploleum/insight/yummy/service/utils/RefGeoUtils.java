@@ -32,6 +32,7 @@ public class RefGeoUtils {
             coordinates = sourceList.get(0).getLatitude() + "," + sourceList.get(0).getLongitude();
 
         } catch (Exception e) {
+            log.error("Failed to get location for locationName " + locationName);
             log.error(e.getMessage(), e);
             throw e;
         }

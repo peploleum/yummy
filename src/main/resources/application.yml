@@ -24,6 +24,7 @@ graph:
   host: localhost
   port: 8090
 elasticsearch:
+  enabled: false
   host: localhost
   port: 9200
   index-name: gazetter

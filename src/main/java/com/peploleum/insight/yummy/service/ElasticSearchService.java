@@ -34,24 +34,28 @@ public class ElasticSearchService {
     private final Logger log = LoggerFactory.getLogger(ElasticSearchService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
     private String searchUrl;
+    private RestTemplate rt;
+    private HttpHeaders headers;
 
     public ElasticSearchService() {
         this.mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
     }
 
     @PostConstruct
     public void setup() {
-        this.searchUrl = "http://" + this.elasticsearchHost + ":" + this.elasticsearchPort + "/"+this.elasticsearchIndex+"/_search";
+        this.searchUrl = "http://" + this.elasticsearchHost + ":" + this.elasticsearchPort + "/" + this.elasticsearchIndex + "/_search";
+        this.rt = new RestTemplate();
+        this.headers = new HttpHeaders();
+        this.headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        this.headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
     }
 
     public EsResponse submitElasticSearchRequest(String locationName) throws IOException {
-        final EsMatchQuery query=new EsMatchQuery("name",locationName);
-
-        final RestTemplate rt = new RestTemplate();
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        this.log.info("submitting request for " + locationName);
+        final EsMatchQuery query = new EsMatchQuery("name", locationName);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
+        this.log.info("using endpoint " + this.searchUrl);
         final ResponseEntity<String> tResponseEntity = rt.exchange(this.searchUrl, HttpMethod.POST, entity, String.class);
         final EsResponse esObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), EsResponse.class);
         esObjectResponse.setContent(tResponseEntity.getBody());
