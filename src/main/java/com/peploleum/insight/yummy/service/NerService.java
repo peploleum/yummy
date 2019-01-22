@@ -178,7 +178,7 @@ public class NerService {
                         else if (o instanceof EventDTO)
                             setFieldValue(o, "eventCoordinates", coordinates);
                         else if (o instanceof LocationDTO)
-                            setFieldValue(o, "setLocationCoordinates", coordinates);
+                            setFieldValue(o, "locationCoordinates", coordinates);
                         else if (o instanceof OrganisationDTO)
                             setFieldValue(o, "organisationCoordinates", coordinates);
                         else if (o instanceof RawDataDTO)
