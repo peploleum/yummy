@@ -166,7 +166,11 @@ public class NerService {
                 this.log.error("Error While getting LocationName list", e);
             }
         }
-
+        if (coordinates != null) {
+            this.log.info("Updating raw data coordinates");
+            setFieldValue(rawDataDto, "rawDataCoordinates", coordinates);
+            this.insightClientService.update(rawDataDto);
+        }
         for (Object o : insightEntities) {
             if (useGraph) {
                 try {
