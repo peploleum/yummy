@@ -23,7 +23,7 @@ public class RefGeoUtils {
         log.info("Getting coordinates for " + locationName);
         String coordinates = null;
         try {
-            EsResponse reponse = elasticSearchService.submitElasticSearchRequest("locationName");
+            EsResponse reponse = elasticSearchService.submitElasticSearchRequest(locationName);
             List<EsSource> sourceList = reponse.getSourceList();
             if (sourceList == null || sourceList.isEmpty()) {
                 return null;
