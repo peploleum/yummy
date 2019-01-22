@@ -7,15 +7,9 @@ package com.peploleum.insight.yummy.dto.source.elasticSearch;
 
 
 public class EsQuery {
-
-
     private String content;
 
-    public EsQuery(){
-
-    }
-    public EsQuery(String content){
-        this.content=content;
+    public EsQuery() {
     }
 
     public String getContent() {
@@ -25,6 +19,4 @@ public class EsQuery {
     public void setContent(String content) {
         this.content = content;
     }
-
-
 }

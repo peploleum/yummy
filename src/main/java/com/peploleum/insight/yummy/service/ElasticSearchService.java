@@ -56,10 +56,12 @@ public class ElasticSearchService {
         final EsMatchQuery query = new EsMatchQuery("name", locationName);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
         this.log.info("using endpoint " + this.searchUrl);
+        this.log.info("sending  " + query.getContent());
         final ResponseEntity<String> tResponseEntity = rt.exchange(this.searchUrl, HttpMethod.POST, entity, String.class);
+        log.info("Received raw " + tResponseEntity.getBody());
         final EsResponse esObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), EsResponse.class);
         esObjectResponse.setContent(tResponseEntity.getBody());
-        log.debug("Received " + tResponseEntity.getBody());
+        log.info("Received " + tResponseEntity.getBody());
         return esObjectResponse;
     }
 
