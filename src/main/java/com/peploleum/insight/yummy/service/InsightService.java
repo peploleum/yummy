@@ -115,7 +115,7 @@ public class InsightService {
         final MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("j_username", "admin");
         map.add("j_password", "admin");
-        map.add("remember-me:", "true");
+        map.add("remember-me", "true");
         map.add("submit", "Login");
         headers.set("X-XSRF-TOKEN", accountCookie);
         headers.add("Cookie", "XSRF-TOKEN=" + accountCookie);
