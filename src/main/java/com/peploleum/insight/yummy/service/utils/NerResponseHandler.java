@@ -29,10 +29,12 @@ public class NerResponseHandler {
     }
 
     private RawDataDTO buildRawDataDto() {
-        RawDataDTO dto = new RawDataDTO();
+        final RawDataDTO dto = new RawDataDTO();
         dto.setRawDataName(this.simpleRawData.getSourceName());
         dto.setRawDataCreationDate(Instant.now());
-        dto.setRawDataType(this.simpleRawData.getSourceType());
+        dto.setRawDataType("OSINT");
+        dto.setRawDataSubType(this.simpleRawData.getSourceType());
+        dto.setRawDataSourceType(this.simpleRawData.getSourceType());
         dto.setRawDataSourceUri(this.simpleRawData.getSourceUrl());
         dto.setRawDataContent(this.simpleRawData.getText());
         if (this.nerResponse != null) {
