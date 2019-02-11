@@ -19,13 +19,15 @@ maven-build:
   script: "mvn clean package -DskipTests" 
   artifacts:
     paths:
-      - src/main/docker/*.jar
+      - target/*.jar
+      - target/*.sh
+      - target/Dockerfile
 
 docker-build:
   stage: deploy 
   script:
     - docker login -u $CI_BUILD_USER -p $CI_BUILD_TOKEN registry.hub.docker.com
-    - cd src/main/docker
+    - cd target
     - docker build -t registry.hub.docker.com/$REPO .
     - docker push registry.hub.docker.com/$REPO 
 
