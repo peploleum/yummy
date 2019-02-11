@@ -25,6 +25,6 @@ docker-build:
   stage: deploy 
   script:
     - docker login -u $CI_BUILD_USER -p $CI_BUILD_TOKEN registry.hub.docker.com
-    - docker build -t registry.hub.docker.com/$REPO -f src/main/docker/Dockerfile
+    - docker build -t registry.hub.docker.com/$REPO -f src/main/docker/Dockerfile .
     - docker push registry.hub.docker.com/$REPO 
 
