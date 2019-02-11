@@ -20,6 +20,7 @@ maven-build:
   artifacts:
     paths:
       - target/*.jar
+      - src/main/docker/entrypoint.sh
 
 docker-build:
   stage: deploy 
