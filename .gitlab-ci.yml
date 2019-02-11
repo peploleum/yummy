@@ -19,7 +19,7 @@ maven-build:
   script: "mvn clean package -DskipTests" 
   artifacts:
     paths:
-      - target/*.jar
+      - src/main/docker/*.jar
 
 docker-build:
   stage: deploy 
