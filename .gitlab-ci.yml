@@ -20,12 +20,12 @@ maven-build:
   artifacts:
     paths:
       - target/*.jar
-      - src/main/docker/entrypoint.sh
 
 docker-build:
   stage: deploy 
   script:
     - docker login -u $CI_BUILD_USER -p $CI_BUILD_TOKEN registry.hub.docker.com
-    - docker build -t registry.hub.docker.com/$REPO -f src/main/docker/Dockerfile .
+    - cd src/main/docker
+    - docker build -t registry.hub.docker.com/$REPO .
     - docker push registry.hub.docker.com/$REPO 
 
