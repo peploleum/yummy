@@ -32,9 +32,9 @@ public class InsightService {
 
     @PostConstruct
     private void onConstruct() {
-        this.cookies = this.generateCookies();
         final RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
         this.restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(10)).build();
+        this.cookies = this.generateCookies();
     }
 
     public String create(Object entity) throws IOException {
