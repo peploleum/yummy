@@ -117,11 +117,16 @@ public class NerService {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
-        final ResponseEntity<String> tResponseEntity = rt.exchange(this.urlner, HttpMethod.POST, entity, String.class);
-        final NerJsonObjectResponse nerObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
-        nerObjectResponse.setContent(tResponseEntity.getBody());
-        log.debug("Received " + tResponseEntity.getBody());
-        return nerObjectResponse;
+        try {
+            final ResponseEntity<String> tResponseEntity = rt.exchange(this.urlner, HttpMethod.POST, entity, String.class);
+            final NerJsonObjectResponse nerObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
+            nerObjectResponse.setContent(tResponseEntity.getBody());
+            log.debug("Received " + tResponseEntity.getBody());
+            return nerObjectResponse;
+        } catch (Exception e) {
+            this.log.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     private void createInRemoteServices(SimpleRawData simpleRawData, NerJsonObjectResponse nerObjectResponse) throws Exception {
