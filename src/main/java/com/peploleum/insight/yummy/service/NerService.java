@@ -208,14 +208,15 @@ public class NerService {
                 }
             }
         }
-        for (Object source : insightEntities) {
-            for (Object target : insightEntities) {
-                this.log.info("Creating relation between " + getFieldValue(source, "externalId") + " and " + getFieldValue(target, "externalId"));
-                try {
-                    this.graphyService.createRelation(source, target);
-                } catch (Exception e) {
-                    this.log.error("Failed to create relation in", e.getMessage());
-                    throw e;
+        if (this.useGraph) {
+            for (Object source : insightEntities) {
+                for (Object target : insightEntities) {
+                    try {
+                        this.log.info("Creating relation between " + getFieldValue(source, "externalId") + " and " + getFieldValue(target, "externalId"));
+                        this.graphyService.createRelation(source, target);
+                    } catch (Exception e) {
+                        this.log.error("Failed to create relation", e.getMessage());
+                    }
                 }
             }
         }
