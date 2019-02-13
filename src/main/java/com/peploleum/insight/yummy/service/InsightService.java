@@ -118,10 +118,10 @@ public class InsightService {
         final ResponseEntity<String> forEntity;
         try {
             forEntity = this.restTemplate.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
-            log.debug("Received " + forEntity);
+            log.warn("Received " + forEntity);
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException.Unauthorized) {
-                log.debug("Unauthorized. Need to retrieve session cookie for future requests.");
+                log.warn("Unauthorized. Need to retrieve session cookie for future requests.");
                 final List<String> cookies = ((HttpClientErrorException.Unauthorized) e).getResponseHeaders().get("Set-Cookie");
                 final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
                 return actualCookie;
@@ -150,6 +150,7 @@ public class InsightService {
             final String xsrfValue = InsightHttpUtils.extractXsrf(cookies);
             final String jessionId = InsightHttpUtils.extractJessionId(cookies);
             if (xsrfValue != null && jessionId != null) {
+                this.log.warn("Cookies found");
                 return cookies;
             }
             return null;
@@ -160,10 +161,14 @@ public class InsightService {
     }
 
     private List<String> generateCookies() {
+        this.log.warn("Generating cookies");
         final String accountCookie = this.account();
+        this.log.warn("Account cookie: " + accountCookie);
         if (accountCookie == null)
             return null;
-        this.log.debug("account cookie received");
-        return this.authent(accountCookie);
+        this.log.warn("Account cookie received. Anthenticating");
+        final List<String> authent = this.authent(accountCookie);
+        return authent;
+
     }
 }
