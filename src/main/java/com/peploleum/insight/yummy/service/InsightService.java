@@ -39,8 +39,22 @@ public class InsightService {
             throw new IOException("Authentication information not found.");
         }
         this.log.debug("Session cookie found");
-        final String id = this.doSend(entity, HttpMethod.POST);
-        return id;
+        try {
+            return this.doSend(entity, HttpMethod.POST);
+        } catch (Exception e) {
+            if (e instanceof HttpClientErrorException.Unauthorized) {
+                log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
+                this.cookies = this.generateCookies();
+                if (this.cookies != null) {
+                    return this.doSend(entity, HttpMethod.POST);
+                } else {
+                    log.error("Could not authenticate.");
+                }
+            } else {
+                throw e;
+            }
+        }
+        return null;
     }
 
     public String update(Object entity) throws IOException {
@@ -50,8 +64,22 @@ public class InsightService {
             throw new IOException("Authentication information not found.");
         }
         this.log.debug("Session cookie found");
-        final String id = this.doSend(entity, HttpMethod.PUT);
-        return id;
+        try {
+            return this.doSend(entity, HttpMethod.PUT);
+        } catch (Exception e) {
+            if (e instanceof HttpClientErrorException.Unauthorized) {
+                log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
+                this.cookies = this.generateCookies();
+                if (this.cookies != null) {
+                    return this.doSend(entity, HttpMethod.PUT);
+                } else {
+                    log.error("Could not authenticate.");
+                }
+            } else {
+                throw e;
+            }
+        }
+        return null;
     }
 
     private String doSend(final Object dto, final HttpMethod method) throws RestClientException {
@@ -68,17 +96,11 @@ public class InsightService {
             }
             tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, method,
                     new HttpEntity<>(dto, headers), Object.class);
-            try {
-                log.debug("Received " + tResponseEntity);
-                final LinkedHashMap body = (LinkedHashMap) tResponseEntity.getBody();
-                final String id = (String) body.get("id");
-                return id;
-            } catch (Exception e) {
-                this.log.warn("Failed to send entity");
-                this.log.debug(e.getMessage(), e);
-                throw e;
-            }
-        } catch (RestClientException e) {
+            log.debug("Received " + tResponseEntity);
+            final LinkedHashMap body = (LinkedHashMap) tResponseEntity.getBody();
+            final String id = (String) body.get("id");
+            return id;
+        } catch (Exception e) {
             this.log.warn("Failed to send entity");
             this.log.debug(e.getMessage(), e);
             throw e;
