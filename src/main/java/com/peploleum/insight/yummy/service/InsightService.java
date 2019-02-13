@@ -47,7 +47,7 @@ public class InsightService {
         try {
             return this.doSend(entity, HttpMethod.POST);
         } catch (Exception e) {
-            if (e instanceof HttpClientErrorException.Unauthorized) {
+            if (e instanceof HttpClientErrorException.Forbidden) {
                 log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
                 this.cookies = this.generateCookies();
                 if (this.cookies != null) {
@@ -72,7 +72,7 @@ public class InsightService {
         try {
             return this.doSend(entity, HttpMethod.PUT);
         } catch (Exception e) {
-            if (e instanceof HttpClientErrorException.Unauthorized) {
+            if (e instanceof HttpClientErrorException.Forbidden) {
                 log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
                 this.cookies = this.generateCookies();
                 if (this.cookies != null) {
