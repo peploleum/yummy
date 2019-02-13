@@ -4,9 +4,9 @@ services:
 
 variables:
   DOCKER_DRIVER: overlay
-  APP_NAME: graphy
+  APP_NAME: yummy
   CI_DOCKER_REGISTRY: registry.hub.docker.com
-  CI_DOCKER_IMAGE: magnarox/$APP_NAME
+  CI_DOCKER_IMAGE: magnarox/yummy
   CI_DOCKER_BUILD_NUMBER: 1.0.0
   CONTAINER_IMAGE: $CI_DOCKER_REGISTRY/$CI_DOCKER_IMAGE:$CI_DOCKER_BUILD_NUMBER
   KUBECTL_VERSION: v1.13.3
@@ -47,4 +47,4 @@ kubernetes_deploy:
     - kubectl config set-credentials $KUBE_USER --token=$KUBE_TOKEN
     - kubectl config set-context $KUBE_CONTEXT --user=$KUBE_USER
     - kubectl config use-context $KUBE_CONTEXT
-    - kubectl set image deployment/$APP_NAME $APP_NAME-app=$CI_DOCKER_IMAGE:$CI_DOCKER_BUILD_NUMBER --namespace=insight
+    - kubectl set image deployment/yummy yummy-app=$CI_DOCKER_IMAGE:$CI_DOCKER_BUILD_NUMBER --namespace=insight
