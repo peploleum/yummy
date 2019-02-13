@@ -4,6 +4,7 @@ import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,10 +28,13 @@ public class InsightService {
 
     private final Logger log = LoggerFactory.getLogger(InsightService.class);
     private List<String> cookies;
+    private RestTemplate restTemplate;
 
     @PostConstruct
     private void onConstruct() {
         this.cookies = this.generateCookies();
+        final RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+        this.restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(10)).build();
     }
 
     public String create(Object entity) throws IOException {
@@ -83,7 +88,6 @@ public class InsightService {
     }
 
     private String doSend(final Object dto, final HttpMethod method) throws RestClientException {
-        final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         final ResponseEntity<Object> tResponseEntity;
         try {
@@ -94,7 +98,7 @@ public class InsightService {
             } else {
                 this.log.debug("Sending " + dto.toString());
             }
-            tResponseEntity = rt.exchange(this.urlinsight + insigthMethodUrl, method,
+            tResponseEntity = this.restTemplate.exchange(this.urlinsight + insigthMethodUrl, method,
                     new HttpEntity<>(dto, headers), Object.class);
             log.debug("Received " + tResponseEntity);
             final LinkedHashMap body = (LinkedHashMap) tResponseEntity.getBody();
@@ -108,13 +112,12 @@ public class InsightService {
     }
 
     private String account() {
-        final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         final HttpEntity<String> entity = new HttpEntity<>(headers);
         final ResponseEntity<String> forEntity;
         try {
-            forEntity = rt.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
+            forEntity = this.restTemplate.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
             log.debug("Received " + forEntity);
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException.Unauthorized) {
@@ -130,7 +133,6 @@ public class InsightService {
     }
 
     private List<String> authent(String accountCookie) {
-        final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -143,7 +145,7 @@ public class InsightService {
         headers.add("Cookie", "XSRF-TOKEN=" + accountCookie);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         try {
-            final ResponseEntity<String> exchange = rt.exchange(this.urlinsight + "authentication", HttpMethod.POST, request, String.class);
+            final ResponseEntity<String> exchange = this.restTemplate.exchange(this.urlinsight + "authentication", HttpMethod.POST, request, String.class);
             final List<String> cookies = exchange.getHeaders().get("Set-Cookie");
             final String xsrfValue = InsightHttpUtils.extractXsrf(cookies);
             final String jessionId = InsightHttpUtils.extractJessionId(cookies);
