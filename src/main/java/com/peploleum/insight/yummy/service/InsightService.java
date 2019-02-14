@@ -34,7 +34,7 @@ public class InsightService {
     private void onConstruct() {
         final RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
         this.restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(10)).build();
-        this.cookies = this.generateCookies();
+        this.cookies = this.generateCookies(true);
     }
 
     public String create(Object entity) throws IOException {
@@ -49,7 +49,7 @@ public class InsightService {
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException.Forbidden) {
                 log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
-                this.cookies = this.generateCookies();
+                this.cookies = this.generateCookies(true);
                 if (this.cookies != null) {
                     return this.doSend(entity, HttpMethod.POST);
                 } else {
@@ -74,7 +74,7 @@ public class InsightService {
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException.Forbidden) {
                 log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
-                this.cookies = this.generateCookies();
+                this.cookies = this.generateCookies(false);
                 if (this.cookies != null) {
                     return this.doSend(entity, HttpMethod.PUT);
                 } else {
@@ -146,8 +146,10 @@ public class InsightService {
         map.add("j_password", "admin");
         map.add("remember-me", "true");
         map.add("submit", "Login");
-        headers.set("X-XSRF-TOKEN", accountCookie);
-        headers.add("Cookie", "XSRF-TOKEN=" + accountCookie);
+        if (accountCookie != null) {
+            headers.set("X-XSRF-TOKEN", accountCookie);
+            headers.add("Cookie", "XSRF-TOKEN=" + accountCookie);
+        }
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         try {
             final ResponseEntity<String> exchange = this.restTemplate.exchange(this.urlinsight + "authentication", HttpMethod.POST, request, String.class);
@@ -165,15 +167,21 @@ public class InsightService {
         }
     }
 
-    private List<String> generateCookies() {
+    private List<String> generateCookies(boolean account) {
         this.log.warn("Generating cookies");
-        final String accountCookie = this.account();
-        this.log.warn("Account cookie: " + accountCookie);
-        if (accountCookie == null)
-            return null;
-        this.log.warn("Account cookie received. Anthenticating");
-        final List<String> authent = this.authent(accountCookie);
-        return authent;
-
+        final String accountCookie;
+        if (account) {
+            accountCookie = this.account();
+            this.log.warn("Account cookie: " + accountCookie);
+            if (accountCookie == null)
+                return null;
+            this.log.warn("Account cookie received. Anthenticating");
+            final List<String> cookies = this.authent(accountCookie);
+            return cookies;
+        } else {
+            this.log.warn("Anthenticating without account cookie");
+            final List<String> cookies = this.authent(null);
+            return cookies;
+        }
     }
 }

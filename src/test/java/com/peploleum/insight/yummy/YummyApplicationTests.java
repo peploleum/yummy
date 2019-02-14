@@ -102,6 +102,10 @@ public class YummyApplicationTests {
         final String idBio = this.insightClientService.create(biographicsDTO);
         Assert.assertNotNull(idRawData);
         Assert.assertNotNull(idBio);
+        final String newIdRawData = this.insightClientService.create(rawDataDTO);
+        final String newIdBiographics = this.insightClientService.create(biographicsDTO);
+        Assert.assertNotNull(newIdRawData);
+        Assert.assertNotNull(newIdBiographics);
     }
 
     @Test
