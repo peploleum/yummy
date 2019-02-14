@@ -32,9 +32,12 @@ public class InsightService {
 
     @PostConstruct
     private void onConstruct() {
-        final RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-        this.restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(10)).build();
-        this.cookies = this.generateCookies(true);
+        initRestTemplateWithCleanSession();
+    }
+
+    private void initRestTemplateWithCleanSession() {
+        this.restTemplate = new RestTemplateBuilder().setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(10)).build();
+        this.cookies = this.generateCookies();
     }
 
     public String create(Object entity) throws IOException {
@@ -49,7 +52,7 @@ public class InsightService {
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException.Forbidden) {
                 log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
-                this.cookies = this.generateCookies(true);
+                initRestTemplateWithCleanSession();
                 if (this.cookies != null) {
                     return this.doSend(entity, HttpMethod.POST);
                 } else {
@@ -74,7 +77,7 @@ public class InsightService {
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException.Forbidden) {
                 log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
-                this.cookies = this.generateCookies(false);
+                initRestTemplateWithCleanSession();
                 if (this.cookies != null) {
                     return this.doSend(entity, HttpMethod.PUT);
                 } else {
@@ -167,21 +170,14 @@ public class InsightService {
         }
     }
 
-    private List<String> generateCookies(boolean account) {
+    private List<String> generateCookies() {
         this.log.warn("Generating cookies");
-        final String accountCookie;
-        if (account) {
-            accountCookie = this.account();
-            this.log.warn("Account cookie: " + accountCookie);
-            if (accountCookie == null)
-                return null;
-            this.log.warn("Account cookie received. Anthenticating");
-            final List<String> cookies = this.authent(accountCookie);
-            return cookies;
-        } else {
-            this.log.warn("Anthenticating without account cookie");
-            final List<String> cookies = this.authent(null);
-            return cookies;
-        }
+        final String accountCookie = this.account();
+        this.log.warn("Account cookie: " + accountCookie);
+        if (accountCookie == null)
+            return null;
+        this.log.warn("Account cookie received. Anthenticating");
+        final List<String> cookies = this.authent(accountCookie);
+        return cookies;
     }
 }
