@@ -121,11 +121,11 @@ public class InsightService {
         final ResponseEntity<String> forEntity;
         try {
             forEntity = this.restTemplate.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
-            log.warn("Received " + forEntity);
-            log.warn("Extracting cookie");
+            log.info("Received " + forEntity);
+            log.info("Extracting cookie");
             final List<String> cookies = forEntity.getHeaders().get("Set-Cookie");
             final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
-            log.warn("Extracted cookie: " + actualCookie);
+            log.info("Extracted cookie: " + actualCookie);
             return actualCookie;
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException.Unauthorized) {
