@@ -30,7 +30,7 @@ public class InsightHttpUtils {
     }
 
     public static String getInsigthMethodUrl(Object o) {
-        if (o instanceof BiographicsDTO) {
+        if (o instanceof Biographics) {
             return "biographics";
         } else if (o instanceof LocationDTO) {
             return "locations";

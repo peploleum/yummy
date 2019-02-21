@@ -1,6 +1,7 @@
 spring:
   main:
     web-application-type: none
+    allow-bean-definition-overriding: true
   cloud:
     stream:
       kafka:
@@ -24,7 +25,9 @@ graph:
   host: localhost
   port: 8090
 elasticsearch:
-  enabled: false
+  enabled: true
   host: localhost
+  clustername: insight
   port: 9200
+  node_port: 9300
   index-name: gazetter

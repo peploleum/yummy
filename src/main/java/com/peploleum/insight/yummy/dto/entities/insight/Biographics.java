@@ -1,5 +1,8 @@
 package com.peploleum.insight.yummy.dto.entities.insight;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,8 +10,11 @@ import java.util.Objects;
 /**
  * A DTO for the Biographics entity.
  */
-public class BiographicsDTO implements Serializable {
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "biographics", createIndex = false, useServerConfiguration = true)
+public class Biographics implements Serializable {
 
+    @Id
+    @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String id;
 
     @NotNull
@@ -119,11 +125,11 @@ public class BiographicsDTO implements Serializable {
             return false;
         }
 
-        BiographicsDTO biographicsDTO = (BiographicsDTO) o;
-        if (biographicsDTO.getId() == null || getId() == null) {
+        Biographics biographics = (Biographics) o;
+        if (biographics.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), biographicsDTO.getId());
+        return Objects.equals(getId(), biographics.getId());
     }
 
     @Override
@@ -133,16 +139,16 @@ public class BiographicsDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "BiographicsDTO{" +
-            "id=" + getId() +
-            ", biographicsFirstname='" + getBiographicsFirstname() + "'" +
-            ", biographicsName='" + getBiographicsName() + "'" +
-            ", biographicsAge=" + getBiographicsAge() +
-            ", biographicsGender='" + getBiographicsGender() + "'" +
-            ", biographicsImage='" + getBiographicsImage() + "'" +
-            ", biographicsCoordinates='" + getBiographicsCoordinates() + "'" +
-            ", biographicsSymbol='" + getBiographicsSymbol() + "'" +
-            ", externalId='" + getExternalId() + "'" +
-            "}";
+        return "Biographics{" +
+                "id=" + getId() +
+                ", biographicsFirstname='" + getBiographicsFirstname() + "'" +
+                ", biographicsName='" + getBiographicsName() + "'" +
+                ", biographicsAge=" + getBiographicsAge() +
+                ", biographicsGender='" + getBiographicsGender() + "'" +
+                ", biographicsImage='" + getBiographicsImage() + "'" +
+                ", biographicsCoordinates='" + getBiographicsCoordinates() + "'" +
+                ", biographicsSymbol='" + getBiographicsSymbol() + "'" +
+                ", externalId='" + getExternalId() + "'" +
+                "}";
     }
 }

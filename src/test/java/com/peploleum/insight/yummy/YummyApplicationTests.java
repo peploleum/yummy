@@ -1,7 +1,7 @@
 package com.peploleum.insight.yummy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
 import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
@@ -95,15 +95,15 @@ public class YummyApplicationTests {
         rawDataDTO.setRawDataName("test");
         rawDataDTO.setRawDataContent("test");
         rawDataDTO.setRawDataCreationDate(Instant.now());
-        final BiographicsDTO biographicsDTO = new BiographicsDTO();
-        biographicsDTO.setBiographicsFirstname("testFirstName");
-        biographicsDTO.setBiographicsName("testName");
+        final Biographics biographics = new Biographics();
+        biographics.setBiographicsFirstname("testFirstName");
+        biographics.setBiographicsName("testName");
         final String idRawData = this.insightClientService.create(rawDataDTO);
-        final String idBio = this.insightClientService.create(biographicsDTO);
+        final String idBio = this.insightClientService.create(biographics);
         Assert.assertNotNull(idRawData);
         Assert.assertNotNull(idBio);
         final String newIdRawData = this.insightClientService.create(rawDataDTO);
-        final String newIdBiographics = this.insightClientService.create(biographicsDTO);
+        final String newIdBiographics = this.insightClientService.create(biographics);
         Assert.assertNotNull(newIdRawData);
         Assert.assertNotNull(newIdBiographics);
     }

@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,10 +58,13 @@ public class NerService {
     @Autowired
     private ElasticSearchService elasticSearchService;
 
+    private SearchService searchService;
+
     private final Logger log = LoggerFactory.getLogger(NerService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
 
-    public NerService() {
+    public NerService(SearchService searchService) {
+        this.searchService = searchService;
         this.mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
@@ -134,12 +138,12 @@ public class NerService {
         log.info("Sending raw data to Insight");
         final RawDataDTO rawDataDto = responseHandler.getRawDataDto();
 
-        String graphySourceId = null;
+        // Create RawData
         final String rawDataId = this.insightClientService.create(rawDataDto);
         rawDataDto.setId(rawDataId);
         if (useGraph) {
             try {
-                graphySourceId = this.graphyService.create(rawDataDto);
+                String graphySourceId = this.graphyService.create(rawDataDto);
                 rawDataDto.setExternalId(graphySourceId);
                 this.insightClientService.update(rawDataDto);
             } catch (RestClientException e) {
@@ -151,17 +155,22 @@ public class NerService {
             }
         }
         log.info("Sent raw data " + rawDataId + " to Insight  ");
+
+        // Get Extracted entities
         final List<Object> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
 
+        // Extract coordinate if Location is present
         String coordinates = null;
         if (this.useElasticSearch) {
             try {
                 final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntity instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
                 for (String locationName : collect) {
                     this.log.info("Found locationName: " + locationName);
-                    if (coordinates == null && locationName != null) {
+                    if (locationName != null) {
                         coordinates = RefGeoUtils.getRefGeoCoordinates(locationName, this.elasticSearchService);
+                        if (coordinates != null)
+                            break;
                     }
                 }
                 if (coordinates == null) {
@@ -171,30 +180,49 @@ public class NerService {
                 this.log.error("Error While getting LocationName list", e);
             }
         }
+        // Update RawData Location
         if (coordinates != null) {
             this.log.info("Updating raw data coordinates");
             setFieldValue(rawDataDto, "rawDataCoordinates", coordinates);
             this.insightClientService.update(rawDataDto);
         }
+
+        // Check if entities already exists
+        List<Object> toCreateEntities = new ArrayList<>();
+        List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
-            if (useGraph) {
-                try {
-                    if (coordinates != null) {
-                        if (o instanceof BiographicsDTO)
-                            setFieldValue(o, "biographicsCoordinates", coordinates);
-                        else if (o instanceof EquipmentDTO)
-                            setFieldValue(o, "equipmentCoordinates", coordinates);
-                        else if (o instanceof EventDTO)
-                            setFieldValue(o, "eventCoordinates", coordinates);
-                        else if (o instanceof LocationDTO)
-                            setFieldValue(o, "locationCoordinates", coordinates);
-                        else if (o instanceof OrganisationDTO)
-                            setFieldValue(o, "organisationCoordinates", coordinates);
-                        else if (o instanceof RawDataDTO)
-                            setFieldValue(o, "rawDataCoordinates", coordinates);
-                    }
-                    final String mongoId = this.insightClientService.create(o);
-                    setFieldValue(o, "id", mongoId);
+            Object searchObj = this.searchService.searchObjectByName(o);
+            if (searchObj == o)
+                toCreateEntities.add(searchObj);
+            else
+                toUpdateEntities.add(searchObj);
+        }
+
+        // Create new Object
+        for (Object o : toCreateEntities) {
+            try {
+                // Add coordinates
+                if (coordinates != null) {
+                    if (o instanceof Biographics)
+                        setFieldValue(o, "biographicsCoordinates", coordinates);
+                    else if (o instanceof EquipmentDTO)
+                        setFieldValue(o, "equipmentCoordinates", coordinates);
+                    else if (o instanceof EventDTO)
+                        setFieldValue(o, "eventCoordinates", coordinates);
+                    else if (o instanceof LocationDTO)
+                        setFieldValue(o, "locationCoordinates", coordinates);
+                    else if (o instanceof OrganisationDTO)
+                        setFieldValue(o, "organisationCoordinates", coordinates);
+                    else if (o instanceof RawDataDTO)
+                        setFieldValue(o, "rawDataCoordinates", coordinates);
+                }
+
+                // Create in DB
+                final String mongoId = this.insightClientService.create(o);
+                setFieldValue(o, "id", mongoId);
+
+                // Create in GraphDB
+                if (useGraph) {
                     this.log.info("Created Insight Entity: " + o.toString());
                     final String janusId = this.graphyService.create(o);
                     setFieldValue(o, "externalId", janusId);
@@ -203,14 +231,21 @@ public class NerService {
                     this.log.info("Updated Insight Entity: " + o.toString());
                     this.log.info("Creating relation between " + getFieldValue(rawDataDto, "externalId") + " and " + getFieldValue(rawDataDto, "externalId"));
                     this.graphyService.createRelation(rawDataDto, o);
-                } catch (Exception e) {
-                    this.log.error("Failed to write in Graphy", e);
                 }
+            } catch (Exception e) {
+                this.log.error("Failed to write in Graphy", e);
             }
         }
+
+        // Group Entities
+        List<Object> allInsightEntities = new ArrayList<>();
+        allInsightEntities.addAll(toCreateEntities);
+        allInsightEntities.addAll(toUpdateEntities);
+
+        // Create Relation
         if (this.useGraph) {
-            for (Object source : insightEntities) {
-                for (Object target : insightEntities) {
+            for (Object source : allInsightEntities) {
+                for (Object target : allInsightEntities) {
                     try {
                         this.log.info("Creating relation between " + getFieldValue(source, "externalId") + " and " + getFieldValue(target, "externalId"));
                         this.graphyService.createRelation(source, target);

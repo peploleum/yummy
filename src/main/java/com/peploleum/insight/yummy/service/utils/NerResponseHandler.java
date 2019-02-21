@@ -1,8 +1,8 @@
 package com.peploleum.insight.yummy.service.utils;
 
+import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
 import com.peploleum.insight.yummy.dto.source.ner.Entity;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.entities.insight.BiographicsDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.OrganisationDTO;
 import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
@@ -71,10 +71,10 @@ public class NerResponseHandler {
                 return organisationDTO;
             case PERSON:
             case PER:
-                final BiographicsDTO biographicsDTO = new BiographicsDTO();
-                biographicsDTO.setBiographicsName(entity.getText());
-                biographicsDTO.setBiographicsFirstname(" ");
-                return biographicsDTO;
+                final Biographics biographics = new Biographics();
+                biographics.setBiographicsName(entity.getText());
+                biographics.setBiographicsFirstname(" ");
+                return biographics;
             default:
                 return null;
         }
