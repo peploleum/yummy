@@ -27,7 +27,7 @@ public class ElasticsearchConfiguration {
     @Value("${elasticsearch.port}")
     private int EsPort;
 
-    @Value("${elasticsearch.node_port}")
+    @Value("${elasticsearch.node-port}")
     private int EsNodePort;
 
     @Value("${elasticsearch.clustername}")

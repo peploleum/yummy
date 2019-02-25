@@ -29,5 +29,5 @@ elasticsearch:
   host: localhost
   clustername: insight
   port: 9200
-  node_port: 9300
+  node-port: 9300
   index-name: gazetter
