@@ -23,7 +23,10 @@ public class SearchService {
         ArrayList<Object> searchResult = new ArrayList<>();
         if (o instanceof Biographics) {
             Iterable<Biographics> iterable = biographicsSearchRepository.search(queryStringQuery("biographicsName : " + ((Biographics) o).getBiographicsName()));
-            iterable.forEach(x -> searchResult.add(x));
+            iterable.forEach(x -> {
+                if(x != null)
+                    searchResult.add(x);
+            });
         }
 
         if (searchResult.isEmpty())
