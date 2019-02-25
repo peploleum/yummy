@@ -1,6 +1,6 @@
 package com.peploleum.insight.yummy.service;
 
-import com.peploleum.insight.yummy.dto.entities.insight.RelationDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.Relation;
 import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,19 +69,19 @@ public class GraphyService {
 
     private String doSendRelation(String idSource, String idTarget, String sourceType, String targetType) throws RestClientException {
         this.log.info("Creating relation between " + idSource + "/" + sourceType + " and " + idTarget + "/" + targetType);
-        final RelationDTO relationDTO = new RelationDTO();
-        relationDTO.setIdJanusSource(idSource);
-        relationDTO.setIdJanusCible(idTarget);
-        relationDTO.setName("linked to");
-        relationDTO.setTypeSource(sourceType);
-        relationDTO.setTypeCible(targetType);
+        final Relation relation = new Relation();
+        relation.setIdJanusSource(idSource);
+        relation.setIdJanusCible(idTarget);
+        relation.setName("linked to");
+        relation.setTypeSource(sourceType);
+        relation.setTypeCible(targetType);
 
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
         final ResponseEntity<String> tResponseEntity;
         try {
             tResponseEntity = rt.exchange(this.apiRootUrl + "relation", HttpMethod.POST,
-                    new HttpEntity<>(relationDTO, headers), String.class);
+                    new HttpEntity<>(relation, headers), String.class);
             log.debug("Received " + tResponseEntity.getBody());
             return tResponseEntity.getBody();
         } catch (RestClientException e) {
@@ -117,6 +117,6 @@ public class GraphyService {
 
 class TypeResolver {
     public static String resolve(Object object) {
-        return object.getClass().getSimpleName().substring(0, object.getClass().getSimpleName().length() - 3);
+        return object.getClass().getSimpleName();
     }
 }

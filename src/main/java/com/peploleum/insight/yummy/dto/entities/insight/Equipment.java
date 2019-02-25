@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * A DTO for the Equipment entity.
  */
-public class EquipmentDTO implements Serializable {
+public class Equipment implements Serializable {
 
     private String id;
 
@@ -108,11 +108,11 @@ public class EquipmentDTO implements Serializable {
             return false;
         }
 
-        EquipmentDTO equipmentDTO = (EquipmentDTO) o;
-        if (equipmentDTO.getId() == null || getId() == null) {
+        Equipment equipment = (Equipment) o;
+        if (equipment.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), equipmentDTO.getId());
+        return Objects.equals(getId(), equipment.getId());
     }
 
     @Override
@@ -122,7 +122,7 @@ public class EquipmentDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "EquipmentDTO{" +
+        return "Equipment{" +
             "id=" + getId() +
             ", equipmentName='" + getEquipmentName() + "'" +
             ", equipmentDescription='" + getEquipmentDescription() + "'" +

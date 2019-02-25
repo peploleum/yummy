@@ -136,16 +136,16 @@ public class NerService {
     private void createInRemoteServices(SimpleRawData simpleRawData, NerJsonObjectResponse nerObjectResponse) throws Exception {
         final NerResponseHandler responseHandler = new NerResponseHandler(nerObjectResponse, simpleRawData);
         log.info("Sending raw data to Insight");
-        final RawDataDTO rawDataDto = responseHandler.getRawDataDto();
+        final RawData rawData = responseHandler.getRawData();
 
         // Create RawData
-        final String rawDataId = this.insightClientService.create(rawDataDto);
-        rawDataDto.setId(rawDataId);
+        final String rawDataId = this.insightClientService.create(rawData);
+        rawData.setId(rawDataId);
         if (useGraph) {
             try {
-                String graphySourceId = this.graphyService.create(rawDataDto);
-                rawDataDto.setExternalId(graphySourceId);
-                this.insightClientService.update(rawDataDto);
+                String graphySourceId = this.graphyService.create(rawData);
+                rawData.setExternalId(graphySourceId);
+                this.insightClientService.update(rawData);
             } catch (RestClientException e) {
                 this.log.error("Failed to write in Graphy", e.getMessage());
                 throw e;
@@ -164,7 +164,7 @@ public class NerService {
         String coordinates = null;
         if (this.useElasticSearch) {
             try {
-                final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntity instanceof LocationDTO).map((insightEntity) -> ((LocationDTO) insightEntity).getLocationName()).collect(Collectors.toList());
+                final List<String> collect = insightEntities.stream().filter((insightEntity) -> insightEntity instanceof Location).map((insightEntity) -> ((Location) insightEntity).getLocationName()).collect(Collectors.toList());
                 for (String locationName : collect) {
                     this.log.info("Found locationName: " + locationName);
                     if (locationName != null) {
@@ -183,8 +183,8 @@ public class NerService {
         // Update RawData Location
         if (coordinates != null) {
             this.log.info("Updating raw data coordinates");
-            setFieldValue(rawDataDto, "rawDataCoordinates", coordinates);
-            this.insightClientService.update(rawDataDto);
+            setFieldValue(rawData, "rawDataCoordinates", coordinates);
+            this.insightClientService.update(rawData);
         }
 
         // Check if entities already exists
@@ -205,15 +205,15 @@ public class NerService {
                 if (coordinates != null) {
                     if (o instanceof Biographics)
                         setFieldValue(o, "biographicsCoordinates", coordinates);
-                    else if (o instanceof EquipmentDTO)
+                    else if (o instanceof Equipment)
                         setFieldValue(o, "equipmentCoordinates", coordinates);
-                    else if (o instanceof EventDTO)
+                    else if (o instanceof Event)
                         setFieldValue(o, "eventCoordinates", coordinates);
-                    else if (o instanceof LocationDTO)
+                    else if (o instanceof Location)
                         setFieldValue(o, "locationCoordinates", coordinates);
-                    else if (o instanceof OrganisationDTO)
+                    else if (o instanceof Organisation)
                         setFieldValue(o, "organisationCoordinates", coordinates);
-                    else if (o instanceof RawDataDTO)
+                    else if (o instanceof RawData)
                         setFieldValue(o, "rawDataCoordinates", coordinates);
                 }
 
@@ -229,8 +229,8 @@ public class NerService {
                     this.log.info("Created Graphy Entity: " + o.toString());
                     this.insightClientService.update(o);
                     this.log.info("Updated Insight Entity: " + o.toString());
-                    this.log.info("Creating relation between " + getFieldValue(rawDataDto, "externalId") + " and " + getFieldValue(rawDataDto, "externalId"));
-                    this.graphyService.createRelation(rawDataDto, o);
+                    this.log.info("Creating relation between " + getFieldValue(rawData, "externalId") + " and " + getFieldValue(rawData, "externalId"));
+                    this.graphyService.createRelation(rawData, o);
                 }
             } catch (Exception e) {
                 this.log.error("Failed to write in Graphy", e);

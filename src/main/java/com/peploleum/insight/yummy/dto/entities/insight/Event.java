@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * A DTO for the Event entity.
  */
-public class EventDTO implements Serializable {
+public class Event implements Serializable {
 
     private String id;
 
@@ -119,11 +119,11 @@ public class EventDTO implements Serializable {
             return false;
         }
 
-        EventDTO eventDTO = (EventDTO) o;
-        if (eventDTO.getId() == null || getId() == null) {
+        Event event = (Event) o;
+        if (event.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), eventDTO.getId());
+        return Objects.equals(getId(), event.getId());
     }
 
     @Override
@@ -133,7 +133,7 @@ public class EventDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "EventDTO{" +
+        return "Event{" +
             "id=" + getId() +
             ", eventName='" + getEventName() + "'" +
             ", eventDescription='" + getEventDescription() + "'" +

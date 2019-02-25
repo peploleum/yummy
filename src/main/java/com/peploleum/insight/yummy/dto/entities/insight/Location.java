@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * A DTO for the Location entity.
  */
-public class LocationDTO implements Serializable {
+public class Location implements Serializable {
 
     private String id;
 
@@ -98,11 +98,11 @@ public class LocationDTO implements Serializable {
             return false;
         }
 
-        LocationDTO locationDTO = (LocationDTO) o;
-        if (locationDTO.getId() == null || getId() == null) {
+        Location location = (Location) o;
+        if (location.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), locationDTO.getId());
+        return Objects.equals(getId(), location.getId());
     }
 
     @Override
@@ -112,7 +112,7 @@ public class LocationDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "LocationDTO{" +
+        return "Location{" +
             "id=" + getId() +
             ", locationName='" + getLocationName() + "'" +
             ", locationType='" + getLocationType() + "'" +

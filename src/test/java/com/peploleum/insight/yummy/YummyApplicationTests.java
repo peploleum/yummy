@@ -2,7 +2,7 @@ package com.peploleum.insight.yummy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
-import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
+import com.peploleum.insight.yummy.dto.entities.insight.RawData;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
@@ -91,18 +91,18 @@ public class YummyApplicationTests {
 
     @Test
     public void insightPostmanTest() throws IOException {
-        final RawDataDTO rawDataDTO = new RawDataDTO();
-        rawDataDTO.setRawDataName("test");
-        rawDataDTO.setRawDataContent("test");
-        rawDataDTO.setRawDataCreationDate(Instant.now());
+        final RawData rawData = new RawData();
+        rawData.setRawDataName("test");
+        rawData.setRawDataContent("test");
+        rawData.setRawDataCreationDate(Instant.now());
         final Biographics biographics = new Biographics();
         biographics.setBiographicsFirstname("testFirstName");
         biographics.setBiographicsName("testName");
-        final String idRawData = this.insightClientService.create(rawDataDTO);
+        final String idRawData = this.insightClientService.create(rawData);
         final String idBio = this.insightClientService.create(biographics);
         Assert.assertNotNull(idRawData);
         Assert.assertNotNull(idBio);
-        final String newIdRawData = this.insightClientService.create(rawDataDTO);
+        final String newIdRawData = this.insightClientService.create(rawData);
         final String newIdBiographics = this.insightClientService.create(biographics);
         Assert.assertNotNull(newIdRawData);
         Assert.assertNotNull(newIdBiographics);
@@ -110,10 +110,10 @@ public class YummyApplicationTests {
 
     @Test
     public void graphPostTest() throws IOException {
-        final RawDataDTO rawDataDTO = new RawDataDTO();
-        rawDataDTO.setRawDataContent("test");
-        rawDataDTO.setRawDataCreationDate(Instant.now());
-        this.insightClientService.create(rawDataDTO);
+        final RawData rawData = new RawData();
+        rawData.setRawDataContent("test");
+        rawData.setRawDataCreationDate(Instant.now());
+        this.insightClientService.create(rawData);
     }
 
 }

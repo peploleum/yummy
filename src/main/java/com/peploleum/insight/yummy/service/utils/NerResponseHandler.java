@@ -1,11 +1,11 @@
 package com.peploleum.insight.yummy.service.utils;
 
 import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
+import com.peploleum.insight.yummy.dto.entities.insight.Location;
+import com.peploleum.insight.yummy.dto.entities.insight.Organisation;
+import com.peploleum.insight.yummy.dto.entities.insight.RawData;
 import com.peploleum.insight.yummy.dto.source.ner.Entity;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
-import com.peploleum.insight.yummy.dto.entities.insight.LocationDTO;
-import com.peploleum.insight.yummy.dto.entities.insight.OrganisationDTO;
-import com.peploleum.insight.yummy.dto.entities.insight.RawDataDTO;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 
 import java.time.Instant;
@@ -19,17 +19,17 @@ public class NerResponseHandler {
     private final SimpleRawData simpleRawData;
 
     private List<Object> insightEntities;
-    private RawDataDTO rawDataDto;
+    private RawData rawData;
 
     public NerResponseHandler(final NerJsonObjectResponse nerResponse, final SimpleRawData simple) {
         this.nerResponse = nerResponse;
         this.simpleRawData = simple;
-        this.rawDataDto = buildRawDataDto();
+        this.rawData = buildRawDataDto();
         this.insightEntities = buildResponseEntities();
     }
 
-    private RawDataDTO buildRawDataDto() {
-        final RawDataDTO dto = new RawDataDTO();
+    private RawData buildRawDataDto() {
+        final RawData dto = new RawData();
         dto.setRawDataName(this.simpleRawData.getSourceName());
         dto.setRawDataCreationDate(Instant.now());
         dto.setRawDataType("OSINT");
@@ -61,14 +61,14 @@ public class NerResponseHandler {
         switch (entity.getType()) {
             case LOCATION:
             case LOC:
-                final LocationDTO locationDTO = new LocationDTO();
-                locationDTO.setLocationName(entity.getText());
-                return locationDTO;
+                final Location location = new Location();
+                location.setLocationName(entity.getText());
+                return location;
             case ORGANIZATION:
             case ORG:
-                final OrganisationDTO organisationDTO = new OrganisationDTO();
-                organisationDTO.setOrganisationName(entity.getText());
-                return organisationDTO;
+                final Organisation organisation = new Organisation();
+                organisation.setOrganisationName(entity.getText());
+                return organisation;
             case PERSON:
             case PER:
                 final Biographics biographics = new Biographics();
@@ -84,7 +84,7 @@ public class NerResponseHandler {
         return insightEntities;
     }
 
-    public RawDataDTO getRawDataDto() {
-        return rawDataDto;
+    public RawData getRawData() {
+        return rawData;
     }
 }

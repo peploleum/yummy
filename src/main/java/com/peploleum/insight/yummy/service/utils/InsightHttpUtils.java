@@ -32,15 +32,15 @@ public class InsightHttpUtils {
     public static String getInsigthMethodUrl(Object o) {
         if (o instanceof Biographics) {
             return "biographics";
-        } else if (o instanceof LocationDTO) {
+        } else if (o instanceof Location) {
             return "locations";
-        } else if (o instanceof OrganisationDTO) {
+        } else if (o instanceof Organisation) {
             return "organisations";
-        } else if (o instanceof RawDataDTO) {
+        } else if (o instanceof RawData) {
             return "raw-data";
-        } else if (o instanceof EventDTO) {
+        } else if (o instanceof Event) {
             return "events";
-        } else if (o instanceof EquipmentDTO) {
+        } else if (o instanceof Equipment) {
             return "equipment";
         } else {
             return null;

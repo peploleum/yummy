@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * A DTO for the Organisation entity.
  */
-public class OrganisationDTO implements Serializable {
+public class Organisation implements Serializable {
 
     private String id;
 
@@ -109,11 +109,11 @@ public class OrganisationDTO implements Serializable {
             return false;
         }
 
-        OrganisationDTO organisationDTO = (OrganisationDTO) o;
-        if (organisationDTO.getId() == null || getId() == null) {
+        Organisation organisation = (Organisation) o;
+        if (organisation.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), organisationDTO.getId());
+        return Objects.equals(getId(), organisation.getId());
     }
 
     @Override
@@ -123,7 +123,7 @@ public class OrganisationDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "OrganisationDTO{" +
+        return "Organisation{" +
             "id=" + getId() +
             ", organisationName='" + getOrganisationName() + "'" +
             ", organisationDescrption='" + getOrganisationDescrption() + "'" +

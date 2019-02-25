@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * A DTO for the RawData entity.
  */
-public class RawDataDTO implements Serializable {
+public class RawData implements Serializable {
 
     private String id;
 
@@ -179,11 +179,11 @@ public class RawDataDTO implements Serializable {
             return false;
         }
 
-        RawDataDTO rawDataDTO = (RawDataDTO) o;
-        if (rawDataDTO.getId() == null || getId() == null) {
+        RawData rawData = (RawData) o;
+        if (rawData.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), rawDataDTO.getId());
+        return Objects.equals(getId(), rawData.getId());
     }
 
     @Override
@@ -193,7 +193,7 @@ public class RawDataDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "RawDataDTO{" +
+        return "RawData{" +
             "id=" + getId() +
             ", rawDataName='" + getRawDataName() + "'" +
             ", rawDataType='" + getRawDataType() + "'" +

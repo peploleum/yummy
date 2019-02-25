@@ -1,6 +1,6 @@
 package com.peploleum.insight.yummy.dto.entities.insight;
 
-public class RelationDTO {
+public class Relation {
 
     private String idJanusSource;
 
@@ -12,7 +12,7 @@ public class RelationDTO {
 
     private String typeCible;
 
-    public RelationDTO() {
+    public Relation() {
     }
 
     public String getName() {
@@ -57,7 +57,7 @@ public class RelationDTO {
 
     @Override
     public String toString() {
-        return "RawDataDTO{" +
+        return "RawData{" +
                 "idJanusSource=" + getIdJanusSource() +
                 "idJanusCible=" + getIdJanusCible() +
                 "typeSource=" + getTypeSource() +
