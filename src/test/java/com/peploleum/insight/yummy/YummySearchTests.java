@@ -42,7 +42,7 @@ public class YummySearchTests {
     }
 
     @Test
-    public void searchBiographics() {
+    public void searchBiographics() throws IllegalAccessException{
         Biographics searchObj = new Biographics();
         searchObj.setBiographicsName(BIO_NAME);
         Object result = this.searchService.searchObjectByName(searchObj);

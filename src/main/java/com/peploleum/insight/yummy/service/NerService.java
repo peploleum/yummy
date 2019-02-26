@@ -192,10 +192,13 @@ public class NerService {
         List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
             Object searchObj = this.searchService.searchObjectByName(o);
+
             if (searchObj == o)
                 toCreateEntities.add(searchObj);
-            else
+            else {
+                this.log.info("Entity already exist : " + getFieldValue(o, "externalId"));
                 toUpdateEntities.add(searchObj);
+            }
         }
 
         // Create new Object
@@ -229,11 +232,23 @@ public class NerService {
                     this.log.info("Created Graphy Entity: " + o.toString());
                     this.insightClientService.update(o);
                     this.log.info("Updated Insight Entity: " + o.toString());
-                    this.log.info("Creating relation between " + getFieldValue(rawData, "externalId") + " and " + getFieldValue(rawData, "externalId"));
+
+                    // BiDirectionnal
+                    this.log.info("Creating relation between " + getFieldValue(rawData, "externalId") + " and " + getFieldValue(o, "externalId"));
                     this.graphyService.createRelation(rawData, o);
+                    this.graphyService.createRelation(o, rawData);
                 }
             } catch (Exception e) {
                 this.log.error("Failed to write in Graphy", e);
+            }
+        }
+
+        if (useGraph) {
+            for (Object o : toUpdateEntities) {
+                // BiDirectionnal
+                this.log.info("Creating relation between " + getFieldValue(rawData, "externalId") + " and " + getFieldValue(o, "externalId"));
+                this.graphyService.createRelation(rawData, o);
+                this.graphyService.createRelation(o, rawData);
             }
         }
 
