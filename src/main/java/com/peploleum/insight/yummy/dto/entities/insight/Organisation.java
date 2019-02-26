@@ -23,7 +23,7 @@ public class Organisation implements Serializable {
 
     private String organisationDescrption;
 
-    private Size organisationSize;
+    private transient Size organisationSize;
 
     private String organisationCoordinates;
 
