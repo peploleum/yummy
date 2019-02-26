@@ -1,7 +1,6 @@
 package com.peploleum.insight.yummy.service;
 
 import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
-import com.peploleum.insight.yummy.dto.entities.insight.Organisation;
 import com.peploleum.insight.yummy.repository.BiographicsSearchRepository;
 import com.peploleum.insight.yummy.repository.OrganisationSearchRepository;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
@@ -57,8 +56,9 @@ public class SearchService {
     private ElasticsearchRepository getRepositoryFromClass(Object o) {
         if (Biographics.class.equals(o.getClass()))
             return this.biographicsSearchRepository;
-        else if (Organisation.class.equals(o.getClass()))
-            return this.organisationSearchRepository;
+        // PB avec l'enum SIZE (peut être une solution avec javas.persistence.Enumerated)
+        //    else if (Organisation.class.equals(o.getClass()))
+        //      return this.organisationSearchRepository;
 
         return null;
     }

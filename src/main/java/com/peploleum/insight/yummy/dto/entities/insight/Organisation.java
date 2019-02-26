@@ -130,14 +130,14 @@ public class Organisation implements Serializable {
     @Override
     public String toString() {
         return "Organisation{" +
-            "id=" + getId() +
-            ", organisationName='" + getOrganisationName() + "'" +
-            ", organisationDescrption='" + getOrganisationDescrption() + "'" +
-            ", organisationSize='" + getOrganisationSize() + "'" +
-            ", organisationCoordinates='" + getOrganisationCoordinates() + "'" +
-            ", organisationImage='" + getOrganisationImage() + "'" +
-            ", organisationSymbol='" + getOrganisationSymbol() + "'" +
-            ", externalId='" + getExternalId() + "'" +
-            "}";
+                "id=" + getId() +
+                ", organisationName='" + getOrganisationName() + "'" +
+                ", organisationDescrption='" + getOrganisationDescrption() + "'" +
+                ", organisationSize='" + getOrganisationSize() + "'" +
+                ", organisationCoordinates='" + getOrganisationCoordinates() + "'" +
+                ", organisationImage='" + getOrganisationImage() + "'" +
+                ", organisationSymbol='" + getOrganisationSymbol() + "'" +
+                ", externalId='" + getExternalId() + "'" +
+                "}";
     }
 }
