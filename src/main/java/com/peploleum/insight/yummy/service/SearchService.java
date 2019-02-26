@@ -1,9 +1,7 @@
 package com.peploleum.insight.yummy.service;
 
 import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
-import com.peploleum.insight.yummy.dto.entities.insight.Organisation;
 import com.peploleum.insight.yummy.repository.BiographicsSearchRepository;
-import com.peploleum.insight.yummy.repository.OrganisationSearchRepository;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +17,11 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 @Service
 public class SearchService {
     private BiographicsSearchRepository biographicsSearchRepository;
-    private OrganisationSearchRepository organisationSearchRepository;
+    //  private OrganisationSearchRepository organisationSearchRepository;
 
-    public SearchService(BiographicsSearchRepository biographicsSearchRepository, OrganisationSearchRepository organisationSearchRepository) {
+    public SearchService(BiographicsSearchRepository biographicsSearchRepository/*, OrganisationSearchRepository organisationSearchRepository*/) {
         this.biographicsSearchRepository = biographicsSearchRepository;
-        this.organisationSearchRepository = organisationSearchRepository;
+        //    this.organisationSearchRepository = organisationSearchRepository;
     }
 
     public Object searchObjectByName(Object o) throws IllegalAccessException {
@@ -57,9 +55,9 @@ public class SearchService {
     private ElasticsearchRepository getRepositoryFromClass(Object o) {
         if (Biographics.class.equals(o.getClass()))
             return this.biographicsSearchRepository;
-            // PB avec l'enum SIZE (peut être une solution avec javas.persistence.Enumerated)
-        else if (Organisation.class.equals(o.getClass()))
-            return this.organisationSearchRepository;
+        // PB avec l'enum SIZE (peut être une solution avec javas.persistence.Enumerated)
+        //else if (Organisation.class.equals(o.getClass()))
+        //   return this.organisationSearchRepository;
 
         return null;
     }

@@ -1,8 +1,5 @@
 package com.peploleum.insight.yummy.dto.entities.insight;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -11,11 +8,11 @@ import java.util.Objects;
 /**
  * A DTO for the Organisation entity.
  */
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "organisation", createIndex = false, useServerConfiguration = true)
+//@org.springframework.data.elasticsearch.annotations.Document(indexName = "organisation", createIndex = false, useServerConfiguration = true)
 public class Organisation implements Serializable {
 
-    @Id
-    @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
+    // @Id
+    // @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String id;
 
     @NotNull
@@ -23,7 +20,7 @@ public class Organisation implements Serializable {
 
     private String organisationDescrption;
 
-    private transient Size organisationSize;
+    private Size organisationSize;
 
     private String organisationCoordinates;
 
