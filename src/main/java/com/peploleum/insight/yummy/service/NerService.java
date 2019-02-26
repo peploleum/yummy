@@ -193,7 +193,7 @@ public class NerService {
         for (Object o : insightEntities) {
             Object searchObj = this.searchService.searchObjectByName(o);
 
-            if (searchObj == o)
+            if (searchObj == o || getFieldValue(o, "externalId") == null)
                 toCreateEntities.add(searchObj);
             else {
                 this.log.info("Entity already exist : " + getFieldValue(o, "externalId"));
@@ -281,6 +281,6 @@ public class NerService {
     private static String getFieldValue(Object dto, String fieldName) throws IllegalAccessException {
         Field field = org.springframework.util.ReflectionUtils.findField(dto.getClass(), fieldName);
         org.springframework.util.ReflectionUtils.makeAccessible(field);
-        return field.get(dto).toString();
+        return field.get(dto) != null ? field.get(dto).toString() : null;
     }
 }
