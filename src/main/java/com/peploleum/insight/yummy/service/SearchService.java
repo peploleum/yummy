@@ -30,12 +30,13 @@ public class SearchService {
         ArrayList<Object> searchResult = new ArrayList<>();
 
         ElasticsearchRepository searchRepo = getRepositoryFromClass(o);
-
-        String fieldName = getFieldName(o);
-        searchRepo.search(queryStringQuery(fieldName + " : " + getFieldValue(o, fieldName))).forEach(x -> {
-            if (x != null)
-                searchResult.add(x);
-        });
+        if (searchRepo != null) {
+            String fieldName = getFieldName(o);
+            searchRepo.search(queryStringQuery(fieldName + " : " + getFieldValue(o, fieldName))).forEach(x -> {
+                if (x != null)
+                    searchResult.add(x);
+            });
+        }
 
         if (searchResult.isEmpty())
             return o;
