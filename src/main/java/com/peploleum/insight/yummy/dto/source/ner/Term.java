@@ -3,8 +3,10 @@ package com.peploleum.insight.yummy.dto.source.ner;
 /**
  * Created by cpoullot on 14/12/2018.
  */
+
 import java.util.HashMap;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,6 +34,8 @@ public class Term {
     private String pos;
     @JsonProperty("morphofeat")
     private String morphofeat;
+    private Integer offset;
+    private Integer length;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -83,6 +87,22 @@ public class Term {
     @JsonProperty("morphofeat")
     public void setMorphofeat(String morphofeat) {
         this.morphofeat = morphofeat;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
+
+    public Integer getLength() {
+        return length;
+    }
+
+    public void setLength(Integer length) {
+        this.length = length;
     }
 
     @JsonAnyGetter

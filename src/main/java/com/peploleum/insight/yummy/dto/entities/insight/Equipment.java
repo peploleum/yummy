@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * A DTO for the Equipment entity.
  */
-public class Equipment implements Serializable {
+public class Equipment extends InsightEntity implements Serializable {
 
     private String id;
 
@@ -123,14 +123,14 @@ public class Equipment implements Serializable {
     @Override
     public String toString() {
         return "Equipment{" +
-            "id=" + getId() +
-            ", equipmentName='" + getEquipmentName() + "'" +
-            ", equipmentDescription='" + getEquipmentDescription() + "'" +
-            ", equipmentType='" + getEquipmentType() + "'" +
-            ", equipmentCoordinates='" + getEquipmentCoordinates() + "'" +
-            ", equipmentSymbol='" + getEquipmentSymbol() + "'" +
-            ", equipmentImage='" + getEquipmentImage() + "'" +
-            ", externalId='" + getExternalId() + "'" +
-            "}";
+                "id=" + getId() +
+                ", equipmentName='" + getEquipmentName() + "'" +
+                ", equipmentDescription='" + getEquipmentDescription() + "'" +
+                ", equipmentType='" + getEquipmentType() + "'" +
+                ", equipmentCoordinates='" + getEquipmentCoordinates() + "'" +
+                ", equipmentSymbol='" + getEquipmentSymbol() + "'" +
+                ", equipmentImage='" + getEquipmentImage() + "'" +
+                ", externalId='" + getExternalId() + "'" +
+                "}";
     }
 }

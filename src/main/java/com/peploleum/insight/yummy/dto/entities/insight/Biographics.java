@@ -11,7 +11,7 @@ import java.util.Objects;
  * A DTO for the Biographics entity.
  */
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "biographics", createIndex = false, useServerConfiguration = true)
-public class Biographics implements Serializable {
+public class Biographics extends InsightEntity implements Serializable {
 
     @Id
     @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)

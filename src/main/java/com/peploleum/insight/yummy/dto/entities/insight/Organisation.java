@@ -8,11 +8,8 @@ import java.util.Objects;
 /**
  * A DTO for the Organisation entity.
  */
-//@org.springframework.data.elasticsearch.annotations.Document(indexName = "organisation", createIndex = false, useServerConfiguration = true)
-public class Organisation implements Serializable {
+public class Organisation extends InsightEntity implements Serializable {
 
-    // @Id
-    // @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String id;
 
     @NotNull

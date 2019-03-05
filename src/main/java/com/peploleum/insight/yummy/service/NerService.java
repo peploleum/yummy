@@ -7,10 +7,12 @@ import com.peploleum.insight.yummy.dto.entities.insight.*;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
+import com.peploleum.insight.yummy.dto.source.rawtext.RawTextMessage;
 import com.peploleum.insight.yummy.dto.source.rss.Item;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
 import com.peploleum.insight.yummy.service.utils.NerResponseHandler;
+import com.peploleum.insight.yummy.service.utils.NerXmlResponseParser;
 import com.peploleum.insight.yummy.service.utils.RefGeoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +22,13 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +106,15 @@ public class NerService {
             this.log.info("Processing TWITTER message");
             final TwitterSourceMessage twitterSourceMessage = (TwitterSourceMessage) message;
             final SimpleRawData simpleRawData = SimpleRawData.fromTwitterSourceMessage(twitterSourceMessage);
-            simpleRawData.setText(twitterSourceMessage.getText());
+            NerJsonObjectResponse nerJsonObjectResponse = null;
+            if (this.useNer) {
+                nerJsonObjectResponse = submitNerRequest(simpleRawData);
+            }
+            createInRemoteServices(simpleRawData, nerJsonObjectResponse);
+        } else if (message instanceof RawTextMessage) {
+            this.log.info("Processing RawText message");
+            final RawTextMessage rawTextSourceMessage = (RawTextMessage) message;
+            final SimpleRawData simpleRawData = SimpleRawData.fromRawTextSourceMessage(rawTextSourceMessage);
             NerJsonObjectResponse nerJsonObjectResponse = null;
             if (this.useNer) {
                 nerJsonObjectResponse = submitNerRequest(simpleRawData);
@@ -119,11 +134,18 @@ public class NerService {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        // headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
         final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
         try {
             final ResponseEntity<String> tResponseEntity = rt.exchange(this.urlner, HttpMethod.POST, entity, String.class);
-            final NerJsonObjectResponse nerObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(tResponseEntity.getBody())));
+            final NerJsonObjectResponse nerObjectResponse = NerXmlResponseParser.getResponseObjectDTO(document);
+            // final NerJsonObjectResponse nerObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
+
             nerObjectResponse.setContent(tResponseEntity.getBody());
             log.debug("Received " + tResponseEntity.getBody());
             return nerObjectResponse;
@@ -157,7 +179,7 @@ public class NerService {
         log.info("Sent raw data " + rawDataId + " to Insight  ");
 
         // Get Extracted entities
-        final List<Object> insightEntities = responseHandler.getInsightEntities();
+        final List<InsightEntity> insightEntities = responseHandler.getInsightEntities();
         log.info("Sending " + insightEntities.size() + " entities to Insight");
 
         // Extract coordinate if Location is present
@@ -270,6 +292,21 @@ public class NerService {
                 }
             }
         }
+
+        // Update le rawData avec les positions des entités dans le texte
+        List<InsightEntity> collect = allInsightEntities.stream().filter(e -> e instanceof InsightEntity)
+                .map(dto -> (InsightEntity) dto).collect(Collectors.toList());
+        List<EntitiesPositionRef> positionRefs = new ArrayList<>();
+        for (InsightEntity e : collect) {
+            String externalId = getFieldValue(e, "externalId");
+            String id = getFieldValue(e, "id");
+            e.getTextPositionInfo().stream().forEach(pos -> positionRefs.add(new EntitiesPositionRef(id, externalId, pos)));
+        }
+        final ObjectMapper mapper = new ObjectMapper();
+        final String positionsToString = mapper.writeValueAsString(positionRefs);
+        rawData.setRawDataAnnotations(positionsToString);
+        this.insightClientService.update(rawData);
+
     }
 
     private static void setFieldValue(Object dto, String fieldName, String externalIdValue) throws IllegalAccessException {
@@ -282,5 +319,41 @@ public class NerService {
         Field field = org.springframework.util.ReflectionUtils.findField(dto.getClass(), fieldName);
         org.springframework.util.ReflectionUtils.makeAccessible(field);
         return field.get(dto) != null ? field.get(dto).toString() : null;
+    }
+
+    class EntitiesPositionRef {
+        private String idMongo;
+        private String idJanus;
+        private Integer position;
+
+        public EntitiesPositionRef(String idMongo, String idJanus, Integer position) {
+            this.idMongo = idMongo;
+            this.idJanus = idJanus;
+            this.position = position;
+        }
+
+        public String getIdMongo() {
+            return idMongo;
+        }
+
+        public void setIdMongo(String idMongo) {
+            this.idMongo = idMongo;
+        }
+
+        public String getIdJanus() {
+            return idJanus;
+        }
+
+        public void setIdJanus(String idJanus) {
+            this.idJanus = idJanus;
+        }
+
+        public Integer getPosition() {
+            return position;
+        }
+
+        public void setPosition(Integer position) {
+            this.position = position;
+        }
     }
 }

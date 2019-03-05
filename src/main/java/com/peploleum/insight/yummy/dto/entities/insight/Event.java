@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * A DTO for the Event entity.
  */
-public class Event implements Serializable {
+public class Event extends InsightEntity implements Serializable {
 
     private String id;
 
@@ -134,15 +134,15 @@ public class Event implements Serializable {
     @Override
     public String toString() {
         return "Event{" +
-            "id=" + getId() +
-            ", eventName='" + getEventName() + "'" +
-            ", eventDescription='" + getEventDescription() + "'" +
-            ", eventType='" + getEventType() + "'" +
-            ", eventDate='" + getEventDate() + "'" +
-            ", eventCoordinates='" + getEventCoordinates() + "'" +
-            ", eventImage='" + getEventImage() + "'" +
-            ", eventSymbol='" + getEventSymbol() + "'" +
-            ", externalId='" + getExternalId() + "'" +
-            "}";
+                "id=" + getId() +
+                ", eventName='" + getEventName() + "'" +
+                ", eventDescription='" + getEventDescription() + "'" +
+                ", eventType='" + getEventType() + "'" +
+                ", eventDate='" + getEventDate() + "'" +
+                ", eventCoordinates='" + getEventCoordinates() + "'" +
+                ", eventImage='" + getEventImage() + "'" +
+                ", eventSymbol='" + getEventSymbol() + "'" +
+                ", externalId='" + getExternalId() + "'" +
+                "}";
     }
 }

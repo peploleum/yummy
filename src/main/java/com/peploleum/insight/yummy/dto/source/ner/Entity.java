@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import com.peploleum.insight.yummy.dto.source.ner.NerEntitiesType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +23,8 @@ public class Entity {
     private NerEntitiesType type;
     @JsonProperty("text")
     private String text;
+    @JsonProperty("terms")
+    private List<String> terms;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -54,6 +57,16 @@ public class Entity {
     @JsonProperty("text")
     public void setText(String text) {
         this.text = text;
+    }
+
+    @JsonProperty("terms")
+    public List<String> getTerms() {
+        return terms;
+    }
+
+    @JsonProperty("terms")
+    public void setTerms(List<String> terms) {
+        this.terms = terms;
     }
 
     @JsonAnyGetter

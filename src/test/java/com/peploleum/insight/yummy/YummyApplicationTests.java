@@ -2,6 +2,7 @@ package com.peploleum.insight.yummy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
+import com.peploleum.insight.yummy.dto.entities.insight.InsightEntity;
 import com.peploleum.insight.yummy.dto.entities.insight.RawData;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
@@ -75,8 +76,8 @@ public class YummyApplicationTests {
         final String content = nerJsonObjectResponse.getContent();
         Assert.assertNotNull(content);
         this.log.info(content);
-        final List<Object> objects = NerResponseHandler.extractInsightEntites(nerJsonObjectResponse);
-        for (final Object object : objects) {
+        final List<InsightEntity> objects = NerResponseHandler.extractInsightEntites(nerJsonObjectResponse);
+        for (final InsightEntity object : objects) {
             this.log.info(object.toString());
         }
     }

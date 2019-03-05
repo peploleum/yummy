@@ -1,5 +1,6 @@
 package com.peploleum.insight.yummy.dto.source;
 
+import com.peploleum.insight.yummy.dto.source.rawtext.RawTextMessage;
 import com.peploleum.insight.yummy.dto.source.rss.RssSourceMessage;
 import com.peploleum.insight.yummy.dto.source.twitter.TwitterSourceMessage;
 
@@ -66,6 +67,14 @@ public class SimpleRawData {
         } catch (Exception e) {
             // nothing
         }
+        return simpleRawData;
+    }
+
+    public static SimpleRawData fromRawTextSourceMessage(final RawTextMessage rawTextSourceMessage) {
+        final SimpleRawData simpleRawData = new SimpleRawData();
+        simpleRawData.setSourceName(rawTextSourceMessage.getTitle());
+        simpleRawData.setSourceType("RAWTEXT");
+        simpleRawData.setText(rawTextSourceMessage.getRawText());
         return simpleRawData;
     }
 

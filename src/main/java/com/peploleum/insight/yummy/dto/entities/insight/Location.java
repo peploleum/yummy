@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * A DTO for the Location entity.
  */
-public class Location implements Serializable {
+public class Location extends InsightEntity implements Serializable {
 
     private String id;
 
@@ -113,13 +113,13 @@ public class Location implements Serializable {
     @Override
     public String toString() {
         return "Location{" +
-            "id=" + getId() +
-            ", locationName='" + getLocationName() + "'" +
-            ", locationType='" + getLocationType() + "'" +
-            ", locationCoordinates='" + getLocationCoordinates() + "'" +
-            ", locationImage='" + getLocationImage() + "'" +
-            ", locationSymbol='" + getLocationSymbol() + "'" +
-            ", externalId='" + getExternalId() + "'" +
-            "}";
+                "id=" + getId() +
+                ", locationName='" + getLocationName() + "'" +
+                ", locationType='" + getLocationType() + "'" +
+                ", locationCoordinates='" + getLocationCoordinates() + "'" +
+                ", locationImage='" + getLocationImage() + "'" +
+                ", locationSymbol='" + getLocationSymbol() + "'" +
+                ", externalId='" + getExternalId() + "'" +
+                "}";
     }
 }
