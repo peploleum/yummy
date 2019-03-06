@@ -134,7 +134,9 @@ public class NerService {
         final RestTemplate rt = new RestTemplate();
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        // headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        /*
+         * Demande la response de type XML et non JSON du wrapper NER pour obtenir la position des entités dans le texte
+         * */
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
         final HttpEntity<NerJsonObjectQuery> entity = new HttpEntity<>(nerQuery, headers);
         try {
@@ -144,7 +146,6 @@ public class NerService {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(tResponseEntity.getBody())));
             final NerJsonObjectResponse nerObjectResponse = NerXmlResponseParser.getResponseObjectDTO(document);
-            // final NerJsonObjectResponse nerObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), NerJsonObjectResponse.class);
 
             nerObjectResponse.setContent(tResponseEntity.getBody());
             log.debug("Received " + tResponseEntity.getBody());

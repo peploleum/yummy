@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -28,17 +29,18 @@ public class RawDataSink {
     @Autowired
     private NerService nerService;
 
-    @EventListener(ApplicationReadyEvent.class)
+    /**
+     * Fonction de test pour import de fichier txt brut
+     * Le contenu est inclu dans un JSON, puis mappé dans le DTO RawTextMessage
+     * */
+    // @EventListener(ApplicationReadyEvent.class)
     public void readFile() {
         try {
             String message = new String(Files.readAllBytes(Paths.get("D:\\Users\\gfolgoas\\Desktop\\rawtxt_sample.txt")));
-            /*StringBuilder sb = new StringBuilder();
-            sb.append("{\"rawText\": \"").append(message).append("\"}");
-            this.handle(sb.toString());*/
 
             Map<String, Object> temp = new HashMap<>();
             temp.put("rawText", message);
-            temp.put("title", "Texte brut sur un american");
+            temp.put("title", "Texte brut de test");
             temp.put("documentType", "txt");
             String jsonRawTxt = new ObjectMapper().writeValueAsString(temp);
 
@@ -48,7 +50,7 @@ public class RawDataSink {
         }
     }
 
-    // @StreamListener(Sink.INPUT)
+    @StreamListener(Sink.INPUT)
     public void handle(String message) {
         log.info("Yummy received raw message");
         log.debug("message content is: " + message);
