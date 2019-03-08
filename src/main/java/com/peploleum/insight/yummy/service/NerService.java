@@ -301,7 +301,29 @@ public class NerService {
         for (InsightEntity e : collect) {
             String externalId = getFieldValue(e, "externalId");
             String id = getFieldValue(e, "id");
-            e.getTextPositionInfo().stream().forEach(pos -> positionRefs.add(new EntitiesPositionRef(id, externalId, pos)));
+
+            String type = "";
+            String word = "";
+            if (e instanceof Biographics) {
+                word = getFieldValue(e, "biographicsFirstname");
+                type = Biographics.class.getSimpleName();
+            } else if (e instanceof Equipment) {
+                word = getFieldValue(e, "equipmentName");
+                type = Equipment.class.getSimpleName();
+            } else if (e instanceof Event) {
+                word = getFieldValue(e, "eventName");
+                type = Event.class.getSimpleName();
+            } else if (e instanceof Location) {
+                word = getFieldValue(e, "locationName");
+                type = Location.class.getSimpleName();
+            } else if (e instanceof Organisation) {
+                word = getFieldValue(e, "organisationName");
+                type = Organisation.class.getSimpleName();
+            }
+            final String entityWord = word;
+            final String entityType = type;
+
+            e.getTextPositionInfo().stream().forEach(pos -> positionRefs.add(new EntitiesPositionRef(id, externalId, pos, entityWord, entityType)));
         }
         final ObjectMapper mapper = new ObjectMapper();
         final String positionsToString = mapper.writeValueAsString(positionRefs);
@@ -326,11 +348,15 @@ public class NerService {
         private String idMongo;
         private String idJanus;
         private Integer position;
+        private String entityWord;
+        private String entityType;
 
-        public EntitiesPositionRef(String idMongo, String idJanus, Integer position) {
+        public EntitiesPositionRef(String idMongo, String idJanus, Integer position, String entityWord, String entityType) {
             this.idMongo = idMongo;
             this.idJanus = idJanus;
             this.position = position;
+            this.entityWord = entityWord;
+            this.entityType = entityType;
         }
 
         public String getIdMongo() {
@@ -355,6 +381,22 @@ public class NerService {
 
         public void setPosition(Integer position) {
             this.position = position;
+        }
+
+        public String getEntityWord() {
+            return entityWord;
+        }
+
+        public void setEntityWord(String entityWord) {
+            this.entityWord = entityWord;
+        }
+
+        public String getEntityType() {
+            return entityType;
+        }
+
+        public void setEntityType(String entityType) {
+            this.entityType = entityType;
         }
     }
 }
