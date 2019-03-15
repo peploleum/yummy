@@ -48,4 +48,4 @@ kubernetes_deploy:
     - kubectl config set-credentials $KUBE_USER --token=$KUBE_TOKEN
     - kubectl config set-context $KUBE_CONTEXT --user=$KUBE_USER
     - kubectl config use-context $KUBE_CONTEXT
-    - kubectl set image deployment/yummy yummy-app=$CI_DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA --namespace=insight
+    - kubectl set image deployment/yummy yummy-app=$CI_BUILD_USER/$CI_DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA --namespace=insight
