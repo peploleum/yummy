@@ -65,13 +65,11 @@ public class NerService {
     @Autowired
     private ElasticSearchService elasticSearchService;
 
-    private SearchService searchService;
 
     private final Logger log = LoggerFactory.getLogger(NerService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
 
-    public NerService(SearchService searchService) {
-        this.searchService = searchService;
+    public NerService() {
         this.mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 

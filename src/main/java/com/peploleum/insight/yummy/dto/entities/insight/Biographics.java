@@ -1,8 +1,5 @@
 package com.peploleum.insight.yummy.dto.entities.insight;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,11 +7,8 @@ import java.util.Objects;
 /**
  * A DTO for the Biographics entity.
  */
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "biographics", createIndex = false, useServerConfiguration = true)
 public class Biographics extends InsightEntity implements Serializable {
 
-    @Id
-    @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String id;
 
     @NotNull
