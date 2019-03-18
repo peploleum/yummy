@@ -32,7 +32,7 @@ public class RawDataSink {
     /**
      * Fonction de test pour import de fichier txt brut
      * Le contenu est inclu dans un JSON, puis mappé dans le DTO RawTextMessage
-     * */
+     */
     // @EventListener(ApplicationReadyEvent.class)
     public void readFile() {
         try {
@@ -61,10 +61,11 @@ public class RawDataSink {
             jsonContent = mapperObj.readValue(message, new TypeReference<Map<String, String>>() {
             });
         } catch (Exception e) {
-            System.out.println(e);
+            this.log.error(e.getMessage(), e);
         }
 
         if (jsonContent == null) {
+            this.log.warn("Failed to parse json message");
             return;
         }
 
