@@ -30,6 +30,12 @@ public class ElasticSearchService {
     @Value("${elasticsearch.index-name}")
     private String elasticsearchGazetteerIndex;
 
+    private String elasticsearchBiopgrahicsIndexName = "biographics";
+    private String elasticsearchEventIndexName = "event";
+    private String elasticsearchLocationIndexName = "location";
+    private String elasticsearchEquipmentIndexName = "equipment";
+    private String elasticsearchOrganisationIndexName = "organisation";
+
     private final Logger log = LoggerFactory.getLogger(ElasticSearchService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
     private String searchUrl;
@@ -49,7 +55,7 @@ public class ElasticSearchService {
         this.headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
     }
 
-    public EsResponse submitElasticSearchRequest(String locationName) throws IOException {
+    public EsResponse submitElasticSearchGazetteerRequest(final String locationName) throws IOException {
         this.log.debug("submitting request for " + locationName);
         final EsMatchQuery query = new EsMatchQuery("name", locationName);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
@@ -61,6 +67,18 @@ public class ElasticSearchService {
         esObjectResponse.setContent(tResponseEntity.getBody());
         log.debug("Received " + tResponseEntity.getBody());
         return esObjectResponse;
+    }
+
+    public String getByNameCriteria(final String name) {
+        this.log.info("Getting by name criteria: " + name);
+        final EsMatchQuery query = new EsMatchQuery("biographicsName", name);
+        final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
+        this.log.debug("using endpoint " + this.searchUrl);
+        this.log.debug("sending  " + query.getContent());
+        final ResponseEntity<String> tResponseEntity = rt.exchange(this.searchUrl + "/" + this.elasticsearchBiopgrahicsIndexName + "/_search", HttpMethod.POST, entity, String.class);
+        log.info("Received raw " + tResponseEntity.getBody());
+        log.debug("Received " + tResponseEntity.getBody());
+        return tResponseEntity.getBody();
     }
 
 

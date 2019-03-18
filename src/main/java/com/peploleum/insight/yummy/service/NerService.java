@@ -214,13 +214,18 @@ public class NerService {
         List<Object> toCreateEntities = new ArrayList<>();
         List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
-            Object searchObj = this.searchService.searchObjectByName(o);
+            if (o instanceof Biographics) {
+                final String biographicsName = this.elasticSearchService.getByNameCriteria(getFieldValue(o, "biographicsName"));
 
-            if (searchObj == o || getFieldValue(o, "externalId") == null)
-                toCreateEntities.add(searchObj);
-            else {
-                this.log.info("Entity already exist : " + getFieldValue(o, "externalId"));
-                toUpdateEntities.add(searchObj);
+                if (biographicsName == null)
+                    toCreateEntities.add(o);
+                else {
+                    this.log.info("Entity already exists: " + biographicsName);
+                    toUpdateEntities.add(o);
+                }
+            } else {
+                this.log.info("Entity does not exist");
+                toCreateEntities.add(o);
             }
         }
 

@@ -9,17 +9,16 @@ public class EsMatchQuery extends EsQuery {
     private String attrName;
     private String attrValue;
 
-    public EsMatchQuery(String attrName, String attrValue)
-    {
-
-       this.attrName=attrName;
-       this.attrValue=attrValue;
-       updateContent();
+    public EsMatchQuery(String attrName, String attrValue) {
+        this.attrName = attrName;
+        this.attrValue = attrValue;
+        updateContent();
     }
 
-    public void updateContent(){
-        setContent("{\"query\":{\"match\" : {\""+attrName+"\":\""+attrValue+"\"}}}");
+    public void updateContent() {
+        setContent("{\"query\":{\"match\" : {\"" + attrName + "\":\"" + attrValue + "\"}}}");
     }
+
     public String getAttrName() {
         return attrName;
     }
