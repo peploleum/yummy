@@ -26,8 +26,8 @@ graph:
   port: 8090
 elasticsearch:
   enabled: true
-  host: localhost
+  host: 10.65.34.149
   clustername: insight
-  port: 9200
-  node-port: 9300
+  port: 30201
+  node-port: 30201
   index-name: gazetter

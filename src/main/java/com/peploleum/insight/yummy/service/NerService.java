@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.entities.insight.*;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
+import com.peploleum.insight.yummy.dto.source.elasticearch.EsHit;
 import com.peploleum.insight.yummy.dto.source.elasticearch.EsResponse;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
@@ -210,22 +211,26 @@ public class NerService {
         }
 
         // Check if entities already exists
-        List<Object> toCreateEntities = new ArrayList<>();
-        List<Object> toUpdateEntities = new ArrayList<>();
+        final List<Object> toCreateEntities = new ArrayList<>();
+        final List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
             if (o instanceof Biographics) {
-                final EsResponse biographicsResponse = this.elasticSearchService.getByNameCriteria(getFieldValue(o, "biographicsName"));
-
-                if (biographicsResponse == null || biographicsResponse.getHits().getTotal().intValue() == 0)
-                    toCreateEntities.add(o);
-                else {
-                    try {
-                        this.log.info("Entity already exists: " + biographicsResponse.getSourceList().stream().findFirst().get().getAdditionalProperties().get("id"));
+                final String biographicsName = getFieldValue(o, "biographicsName");
+                final EsResponse biographicsResponse = this.elasticSearchService.getByNameCriteria(biographicsName);
+                try {
+                    if (biographicsResponse.getHits().getTotal() == 0) {
+                        this.log.warn("no hit for: " + biographicsName);
+                        toCreateEntities.add(o);
+                    } else {
+                        final EsHit esHit = biographicsResponse.getHits().getHits().stream().findFirst().get();
+                        ((Biographics) o).setId(esHit.getId());
+                        this.log.warn("hit for: " + biographicsName + " " + esHit.getId());
                         toUpdateEntities.add(o);
-                    } catch (Exception e) {
-                        this.log.warn("failed to extract existing object properties");
-                        this.log.warn(e.getMessage(), e);
                     }
+                } catch (Exception e) {
+                    this.log.warn("failed to extract existing object properties");
+                    this.log.warn(e.getMessage(), e);
+                    toCreateEntities.add(o);
                 }
             } else {
                 this.log.info("Entity does not exist");

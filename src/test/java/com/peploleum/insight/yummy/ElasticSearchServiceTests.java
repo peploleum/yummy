@@ -1,5 +1,6 @@
 package com.peploleum.insight.yummy;
 
+import com.peploleum.insight.yummy.dto.source.elasticearch.EsHit;
 import com.peploleum.insight.yummy.dto.source.elasticearch.EsResponse;
 import com.peploleum.insight.yummy.service.ElasticSearchService;
 import org.junit.Assert;
@@ -24,6 +25,8 @@ public class ElasticSearchServiceTests {
     public void getBiographicsByName() {
         this.log.info("searching by name criteria");
         final EsResponse result = this.elasticSearchService.getByNameCriteria("Donald Trump");
-        Assert.assertNotNull(result);
+        final EsHit esHit = result.getHits().getHits().stream().findFirst().get();
+        Assert.assertNotNull(esHit);
+        Assert.assertEquals("biographics", esHit.getType());
     }
 }
