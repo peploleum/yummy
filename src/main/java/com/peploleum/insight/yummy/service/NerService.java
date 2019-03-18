@@ -215,9 +215,10 @@ public class NerService {
         final List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
             final String value = getFieldValue(o, getIndexKey(o));
-            this.log.info("searching entity in index");
-            final EsResponse response = this.elasticSearchService.getByNameCriteria(getIndexKey(o), value, o.getClass().getSimpleName().toLowerCase());
             try {
+                this.log.info("searching entity in index");
+                final EsResponse response = this.elasticSearchService.getByNameCriteria(getIndexKey(o), value, o.getClass().getSimpleName().toLowerCase());
+
                 if (response.getHits().getTotal() == 0) {
                     this.log.warn("no hit for: " + value);
                     toCreateEntities.add(o);
