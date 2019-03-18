@@ -1,8 +1,8 @@
-package com.peploleum.insight.yummy.dto.source.elasticSearch;
+package com.peploleum.insight.yummy.dto.source.elasticearch;
 
 /**
  * Created by cpoullot on 18/01/2019.
- * contenu (Body) Json de la requete a envoyer a elasticSearch
+ * contenu (Body) Json de la requete a envoyer a elasticearch
  */
 
 

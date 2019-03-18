@@ -1,4 +1,4 @@
-package com.peploleum.insight.yummy.dto.source.elasticSearch;
+package com.peploleum.insight.yummy.dto.source.elasticearch;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -92,7 +92,7 @@ public class EsResponse {
     }
 
 
-    //methode pour obtenir la liste des resultats (objet EsSource) de la requete elasticSearch
+    //methode pour obtenir la liste des resultats (objet EsSource) de la requete elasticearch
     public List<EsSource> getSourceList()
     {
         List<EsSource> listSources=new ArrayList<>();

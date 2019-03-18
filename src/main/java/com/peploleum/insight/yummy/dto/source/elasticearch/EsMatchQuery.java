@@ -1,4 +1,4 @@
-package com.peploleum.insight.yummy.dto.source.elasticSearch;
+package com.peploleum.insight.yummy.dto.source.elasticearch;
 
 /**
  * Created by cpoullot on 21/01/2019.

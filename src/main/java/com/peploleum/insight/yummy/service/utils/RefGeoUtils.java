@@ -1,7 +1,7 @@
 package com.peploleum.insight.yummy.service.utils;
 
-import com.peploleum.insight.yummy.dto.source.elasticSearch.EsResponse;
-import com.peploleum.insight.yummy.dto.source.elasticSearch.EsSource;
+import com.peploleum.insight.yummy.dto.source.elasticearch.EsResponse;
+import com.peploleum.insight.yummy.dto.source.elasticearch.EsSource;
 import com.peploleum.insight.yummy.service.ElasticSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.peploleum.insight.yummy.dto.source.elasticSearch;
+package com.peploleum.insight.yummy.dto.source.elasticearch;
 
 import com.fasterxml.jackson.annotation.*;
 
