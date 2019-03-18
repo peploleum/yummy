@@ -25,11 +25,10 @@ public class ElasticSearchService {
 
     @Value("${elasticsearch.host}")
     private String elasticsearchHost;
-
     @Value("${elasticsearch.port}")
     private String elasticsearchPort;
     @Value("${elasticsearch.index-name}")
-    private String elasticsearchIndex;
+    private String elasticsearchGazetteerIndex;
 
     private final Logger log = LoggerFactory.getLogger(ElasticSearchService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
@@ -39,12 +38,11 @@ public class ElasticSearchService {
 
     public ElasticSearchService() {
         this.mapperObj.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
     }
 
     @PostConstruct
     public void setup() {
-        this.searchUrl = "http://" + this.elasticsearchHost + ":" + this.elasticsearchPort + "/" + this.elasticsearchIndex + "/_search";
+        this.searchUrl = "http://" + this.elasticsearchHost + ":" + this.elasticsearchPort;
         this.rt = new RestTemplate();
         this.headers = new HttpHeaders();
         this.headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -57,7 +55,7 @@ public class ElasticSearchService {
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
         this.log.debug("using endpoint " + this.searchUrl);
         this.log.debug("sending  " + query.getContent());
-        final ResponseEntity<String> tResponseEntity = rt.exchange(this.searchUrl, HttpMethod.POST, entity, String.class);
+        final ResponseEntity<String> tResponseEntity = rt.exchange(this.searchUrl + "/" + this.elasticsearchGazetteerIndex + "/_search", HttpMethod.POST, entity, String.class);
         log.debug("Received raw " + tResponseEntity.getBody());
         final EsResponse esObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), EsResponse.class);
         esObjectResponse.setContent(tResponseEntity.getBody());
