@@ -73,12 +73,12 @@ public class ElasticSearchService {
      * @return and {@link EsResponse} wrapping the ES response
      */
     public EsResponse getByNameCriteria(final String attributeName, final String attributeValue, final String indexName) {
-        this.log.info("Getting by name criteria: " + attributeName + ":" + attributeValue);
+        this.log.info("Getting by name criteria: " + attributeName + ":" + attributeValue + " in index: " + indexName);
         final EsMatchQuery query = new EsMatchQuery(attributeName, attributeValue);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
-        this.log.debug("using endpoint " + this.searchUrl);
-        this.log.debug("sending  " + query.getContent());
-        final ResponseEntity<EsResponse> tResponseEntity = rt.exchange(this.searchUrl + "/" + indexName + "/_search", HttpMethod.POST, entity, EsResponse.class);
+        final String endpoint = this.searchUrl + "/" + indexName + "/_search";
+        this.log.info("using endpoint " + endpoint);
+        final ResponseEntity<EsResponse> tResponseEntity = rt.exchange(endpoint, HttpMethod.POST, entity, EsResponse.class);
         log.info("Received raw " + tResponseEntity.getBody().getContent());
         return tResponseEntity.getBody();
     }
