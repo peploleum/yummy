@@ -223,9 +223,9 @@ public class NerService {
                     toCreateEntities.add(o);
                 } else {
                     final EsHit esHit = response.getHits().getHits().stream().findFirst().get();
-                    ((Biographics) o).setId(esHit.getId());
-                    ((Biographics) o).setExternalId(esHit.getSource().getAdditionalProperties().get("externalId").toString());
                     this.log.warn("hit for: " + value + " " + esHit.getId());
+                    setFieldValue(o, "id", esHit.getId());
+                    setFieldValue(o, "externalId", esHit.getSource().getAdditionalProperties().get("externalId").toString());
                     toUpdateEntities.add(o);
                 }
             } catch (Exception e) {
