@@ -215,6 +215,7 @@ public class NerService {
         final List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
             final String value = getFieldValue(o, getIndexKey(o));
+            this.log.info("searching entity in index");
             final EsResponse response = this.elasticSearchService.getByNameCriteria(getIndexKey(o), value, o.getClass().getName().toLowerCase());
             try {
                 if (response.getHits().getTotal() == 0) {
@@ -223,6 +224,7 @@ public class NerService {
                 } else {
                     final EsHit esHit = response.getHits().getHits().stream().findFirst().get();
                     ((Biographics) o).setId(esHit.getId());
+                    ((Biographics) o).setExternalId(esHit.getSource().getAdditionalProperties().get("externalId").toString());
                     this.log.warn("hit for: " + value + " " + esHit.getId());
                     toUpdateEntities.add(o);
                 }
