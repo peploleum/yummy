@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.entities.insight.*;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
+import com.peploleum.insight.yummy.dto.source.elasticearch.EsResponse;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectQuery;
 import com.peploleum.insight.yummy.dto.source.ner.NerJsonObjectResponse;
 import com.peploleum.insight.yummy.dto.source.rawtext.RawTextMessage;
@@ -213,13 +214,18 @@ public class NerService {
         List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
             if (o instanceof Biographics) {
-                final String biographicsName = this.elasticSearchService.getByNameCriteria(getFieldValue(o, "biographicsName"));
+                final EsResponse biographicsResponse = this.elasticSearchService.getByNameCriteria(getFieldValue(o, "biographicsName"));
 
-                if (biographicsName == null)
+                if (biographicsResponse == null || biographicsResponse.getHits().getTotal().intValue() == 0)
                     toCreateEntities.add(o);
                 else {
-                    this.log.info("Entity already exists: " + biographicsName);
-                    toUpdateEntities.add(o);
+                    try {
+                        this.log.info("Entity already exists: " + biographicsResponse.getSourceList().stream().findFirst().get().getAdditionalProperties().get("id"));
+                        toUpdateEntities.add(o);
+                    } catch (Exception e) {
+                        this.log.warn("failed to extract existing object properties");
+                        this.log.warn(e.getMessage(), e);
+                    }
                 }
             } else {
                 this.log.info("Entity does not exist");
