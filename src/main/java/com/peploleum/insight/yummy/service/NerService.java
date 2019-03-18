@@ -214,26 +214,21 @@ public class NerService {
         final List<Object> toCreateEntities = new ArrayList<>();
         final List<Object> toUpdateEntities = new ArrayList<>();
         for (Object o : insightEntities) {
-            if (o instanceof Biographics) {
-                final String biographicsName = getFieldValue(o, "biographicsName");
-                final EsResponse biographicsResponse = this.elasticSearchService.getByNameCriteria(biographicsName);
-                try {
-                    if (biographicsResponse.getHits().getTotal() == 0) {
-                        this.log.warn("no hit for: " + biographicsName);
-                        toCreateEntities.add(o);
-                    } else {
-                        final EsHit esHit = biographicsResponse.getHits().getHits().stream().findFirst().get();
-                        ((Biographics) o).setId(esHit.getId());
-                        this.log.warn("hit for: " + biographicsName + " " + esHit.getId());
-                        toUpdateEntities.add(o);
-                    }
-                } catch (Exception e) {
-                    this.log.warn("failed to extract existing object properties");
-                    this.log.warn(e.getMessage(), e);
+            final String value = getFieldValue(o, getIndexKey(o));
+            final EsResponse response = this.elasticSearchService.getByNameCriteria(getIndexKey(o), value, o.getClass().getName().toLowerCase());
+            try {
+                if (response.getHits().getTotal() == 0) {
+                    this.log.warn("no hit for: " + value);
                     toCreateEntities.add(o);
+                } else {
+                    final EsHit esHit = response.getHits().getHits().stream().findFirst().get();
+                    ((Biographics) o).setId(esHit.getId());
+                    this.log.warn("hit for: " + value + " " + esHit.getId());
+                    toUpdateEntities.add(o);
                 }
-            } else {
-                this.log.info("Entity does not exist");
+            } catch (Exception e) {
+                this.log.warn("failed to extract existing object properties");
+                this.log.warn(e.getMessage(), e);
                 toCreateEntities.add(o);
             }
         }
@@ -356,6 +351,22 @@ public class NerService {
         Field field = org.springframework.util.ReflectionUtils.findField(dto.getClass(), fieldName);
         org.springframework.util.ReflectionUtils.makeAccessible(field);
         return field.get(dto) != null ? field.get(dto).toString() : null;
+    }
+
+    private String getIndexKey(Object dto) {
+        if (dto instanceof Biographics)
+            return "biographicsName";
+        else if (dto instanceof Equipment)
+            return "equipmentName";
+        else if (dto instanceof Event)
+            return "eventName";
+        else if (dto instanceof Location)
+            return "locationName";
+        else if (dto instanceof Organisation)
+            return "organisationName";
+        else if (dto instanceof RawData)
+            return "rawdataName";
+        return null;
     }
 
     class EntitiesPositionRef {

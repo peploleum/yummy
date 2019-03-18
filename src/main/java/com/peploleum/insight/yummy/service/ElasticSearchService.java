@@ -30,11 +30,6 @@ public class ElasticSearchService {
     @Value("${elasticsearch.index-name}")
     private String elasticsearchGazetteerIndex;
 
-    private String elasticsearchBiopgrahicsIndexName = "biographics";
-    private String elasticsearchEventIndexName = "event";
-    private String elasticsearchLocationIndexName = "location";
-    private String elasticsearchEquipmentIndexName = "equipment";
-    private String elasticsearchOrganisationIndexName = "organisation";
 
     private final Logger log = LoggerFactory.getLogger(ElasticSearchService.class);
     private ObjectMapper mapperObj = new ObjectMapper();
@@ -69,13 +64,21 @@ public class ElasticSearchService {
         return esObjectResponse;
     }
 
-    public EsResponse getByNameCriteria(final String name) {
-        this.log.info("Getting by name criteria: " + name);
-        final EsMatchQuery query = new EsMatchQuery("biographicsName", name);
+    /**
+     * performs search query for attribute and value couple in specified index
+     *
+     * @param attributeName  attribute key
+     * @param attributeValue attribute value
+     * @param indexName      name of the ES index to query
+     * @return and {@link EsResponse} wrapping the ES response
+     */
+    public EsResponse getByNameCriteria(final String attributeName, final String attributeValue, final String indexName) {
+        this.log.info("Getting by name criteria: " + attributeName + ":" + attributeValue);
+        final EsMatchQuery query = new EsMatchQuery(attributeName, attributeValue);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
         this.log.debug("using endpoint " + this.searchUrl);
         this.log.debug("sending  " + query.getContent());
-        final ResponseEntity<EsResponse> tResponseEntity = rt.exchange(this.searchUrl + "/" + this.elasticsearchBiopgrahicsIndexName + "/_search", HttpMethod.POST, entity, EsResponse.class);
+        final ResponseEntity<EsResponse> tResponseEntity = rt.exchange(this.searchUrl + "/" + indexName + "/_search", HttpMethod.POST, entity, EsResponse.class);
         log.info("Received raw " + tResponseEntity.getBody().getContent());
         return tResponseEntity.getBody();
     }

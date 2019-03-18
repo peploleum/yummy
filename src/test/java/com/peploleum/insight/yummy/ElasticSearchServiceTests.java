@@ -24,7 +24,7 @@ public class ElasticSearchServiceTests {
     @Test
     public void getBiographicsByName() {
         this.log.info("searching by name criteria");
-        final EsResponse result = this.elasticSearchService.getByNameCriteria("Donald Trump");
+        final EsResponse result = this.elasticSearchService.getByNameCriteria("biographicsName","Donald Trump", "biographics");
         final EsHit esHit = result.getHits().getHits().stream().findFirst().get();
         Assert.assertNotNull(esHit);
         Assert.assertEquals("biographics", esHit.getType());
