@@ -69,15 +69,14 @@ public class ElasticSearchService {
         return esObjectResponse;
     }
 
-    public String getByNameCriteria(final String name) {
+    public EsResponse getByNameCriteria(final String name) {
         this.log.info("Getting by name criteria: " + name);
         final EsMatchQuery query = new EsMatchQuery("biographicsName", name);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
         this.log.debug("using endpoint " + this.searchUrl);
         this.log.debug("sending  " + query.getContent());
-        final ResponseEntity<String> tResponseEntity = rt.exchange(this.searchUrl + "/" + this.elasticsearchBiopgrahicsIndexName + "/_search", HttpMethod.POST, entity, String.class);
-        log.info("Received raw " + tResponseEntity.getBody());
-        log.debug("Received " + tResponseEntity.getBody());
+        final ResponseEntity<EsResponse> tResponseEntity = rt.exchange(this.searchUrl + "/" + this.elasticsearchBiopgrahicsIndexName + "/_search", HttpMethod.POST, entity, EsResponse.class);
+        log.info("Received raw " + tResponseEntity.getBody().getContent());
         return tResponseEntity.getBody();
     }
 
