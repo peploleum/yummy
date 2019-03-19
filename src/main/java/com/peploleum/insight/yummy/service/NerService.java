@@ -229,12 +229,12 @@ public class NerService {
                 final EsResponse response = this.elasticSearchService.getByNameCriteria(getIndexKey(o), value, o.getClass().getSimpleName().toLowerCase());
 
                 if (response.getHits().getTotal() == 0) {
-                    this.log.warn("no hit for: " + value);
+                    this.log.info("no index hit for: " + value);
                     toCreateEntities.add(o);
                 } else {
                     final EsHit esHit = response.getHits().getHits().stream().findFirst().get();
                     final String externalId = esHit.getSource().getAdditionalProperties().get(EXTERNAL_ID).toString();
-                    this.log.info("hit for: " + value + " " + esHit.getId() + " " + externalId);
+                    this.log.info("index hit for: " + value + " " + esHit.getId() + " " + externalId);
                     setFieldValue(o, ID, esHit.getId());
                     setFieldValue(o, EXTERNAL_ID, externalId);
                     toUpdateEntities.add(o);

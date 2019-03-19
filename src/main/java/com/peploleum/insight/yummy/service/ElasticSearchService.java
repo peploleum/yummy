@@ -50,6 +50,13 @@ public class ElasticSearchService {
         this.headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
     }
 
+    /**
+     * performs search query in gazetteer ES index and wraps response as an {@link EsResponse}
+     *
+     * @param locationName search criteria
+     * @return en {@link EsResponse} wrapping the result
+     * @throws IOException if result cannot be wrapped
+     */
     public EsResponse submitElasticSearchGazetteerRequest(final String locationName) throws IOException {
         this.log.debug("submitting request for " + locationName);
         final EsMatchQuery query = new EsMatchQuery("name", locationName);
@@ -73,7 +80,7 @@ public class ElasticSearchService {
      * @return and {@link EsResponse} wrapping the ES response
      */
     public EsResponse getByNameCriteria(final String attributeName, final String attributeValue, final String indexName) {
-        this.log.info("Getting by name criteria: " + attributeName + ":" + attributeValue + " in index: " + indexName);
+        this.log.info("Getting by name criteria: " + attributeName + "=" + attributeValue + " [" + indexName + "]");
         final EsMatchQuery query = new EsMatchQuery(attributeName, attributeValue);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
         final String endpoint = this.searchUrl + "/" + indexName + "/_search";
