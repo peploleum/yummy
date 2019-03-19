@@ -93,24 +93,20 @@ public class EsResponse {
 
 
     //methode pour obtenir la liste des resultats (objet EsSource) de la requete elasticearch
-    public List<EsSource> getSourceList()
-    {
-        List<EsSource> listSources=new ArrayList<>();
+    public List<EsSource> getSourceList() {
+        List<EsSource> listSources = new ArrayList<>();
         //s'il y a des resultats
-        if(getHits()!=null)
-        {
+        if (getHits() != null) {
             //EsHits est une liste de EsHit
-            EsHits hits=getHits();
+            EsHits hits = getHits();
             //s'il y a plus de zero hit
-            if (hits.getTotal()>0)
-            {
+            if (hits.getTotal() > 0) {
                 //chaque EsHit a 1 EsSource (resutats)
-                for (EsHit hit :hits.getHits()
-                        ) {
+                for (EsHit hit : hits.getHits()
+                ) {
                     listSources.add(hit.getSource());
                 }
             }
-
         }
         return listSources;
     }

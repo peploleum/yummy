@@ -86,7 +86,7 @@ public class ElasticSearchService {
         final String endpoint = this.searchUrl + "/" + indexName + "/_search";
         this.log.info("using endpoint " + endpoint);
         final ResponseEntity<EsResponse> tResponseEntity = rt.exchange(endpoint, HttpMethod.POST, entity, EsResponse.class);
-        log.info("Received raw " + tResponseEntity.getBody().getContent());
+        log.info("Received raw response " + tResponseEntity.getBody().toString());
         return tResponseEntity.getBody();
     }
 
