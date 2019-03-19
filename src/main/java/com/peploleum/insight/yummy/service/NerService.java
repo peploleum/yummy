@@ -40,6 +40,15 @@ import java.util.stream.Collectors;
 @Service
 public class NerService {
 
+    public static final String ID = "id";
+    public static final String EXTERNAL_ID = "externalId";
+    public static final String BIOGRAPHICS_COORDINATES = "biographicsCoordinates";
+    public static final String EQUIPMENT_COORDINATES = "equipmentCoordinates";
+    public static final String EVENT_COORDINATES = "eventCoordinates";
+    public static final String LOCATION_COORDINATES = "locationCoordinates";
+    public static final String ORGANISATION_COORDINATES = "organisationCoordinates";
+    public static final String RAW_DATA_COORDINATES = "rawDataCoordinates";
+
     @Value("${urlner}")
     private String urlner;
 
@@ -224,9 +233,10 @@ public class NerService {
                     toCreateEntities.add(o);
                 } else {
                     final EsHit esHit = response.getHits().getHits().stream().findFirst().get();
-                    this.log.warn("hit for: " + value + " " + esHit.getId());
-                    setFieldValue(o, "id", esHit.getId());
-                    setFieldValue(o, "externalId", esHit.getSource().getAdditionalProperties().get("externalId").toString());
+                    final String externalId = esHit.getSource().getAdditionalProperties().get(EXTERNAL_ID).toString();
+                    this.log.info("hit for: " + value + " " + esHit.getId() + " " + externalId);
+                    setFieldValue(o, ID, esHit.getId());
+                    setFieldValue(o, EXTERNAL_ID, externalId);
                     toUpdateEntities.add(o);
                 }
             } catch (Exception e) {
@@ -242,17 +252,17 @@ public class NerService {
                 // Add coordinates
                 if (coordinates != null) {
                     if (o instanceof Biographics)
-                        setFieldValue(o, "biographicsCoordinates", coordinates);
+                        setFieldValue(o, BIOGRAPHICS_COORDINATES, coordinates);
                     else if (o instanceof Equipment)
-                        setFieldValue(o, "equipmentCoordinates", coordinates);
+                        setFieldValue(o, EQUIPMENT_COORDINATES, coordinates);
                     else if (o instanceof Event)
-                        setFieldValue(o, "eventCoordinates", coordinates);
+                        setFieldValue(o, EVENT_COORDINATES, coordinates);
                     else if (o instanceof Location)
-                        setFieldValue(o, "locationCoordinates", coordinates);
+                        setFieldValue(o, LOCATION_COORDINATES, coordinates);
                     else if (o instanceof Organisation)
-                        setFieldValue(o, "organisationCoordinates", coordinates);
+                        setFieldValue(o, ORGANISATION_COORDINATES, coordinates);
                     else if (o instanceof RawData)
-                        setFieldValue(o, "rawDataCoordinates", coordinates);
+                        setFieldValue(o, RAW_DATA_COORDINATES, coordinates);
                 }
 
                 // Create in DB
@@ -263,13 +273,13 @@ public class NerService {
                 if (useGraph) {
                     this.log.info("Created Insight Entity: " + o.toString());
                     final String janusId = this.graphyService.create(o);
-                    setFieldValue(o, "externalId", janusId);
+                    setFieldValue(o, EXTERNAL_ID, janusId);
                     this.log.info("Created Graphy Entity: " + o.toString());
                     this.insightClientService.update(o);
                     this.log.info("Updated Insight Entity: " + o.toString());
 
                     // BiDirectionnal
-                    this.log.info("Creating relation between " + getFieldValue(rawData, "externalId") + " and " + getFieldValue(o, "externalId"));
+                    this.log.info("Creating relation between " + getFieldValue(rawData, EXTERNAL_ID) + " and " + getFieldValue(o, EXTERNAL_ID));
                     this.graphyService.createRelation(rawData, o);
                     this.graphyService.createRelation(o, rawData);
                 }
@@ -281,7 +291,7 @@ public class NerService {
         if (useGraph) {
             for (Object o : toUpdateEntities) {
                 // BiDirectionnal
-                this.log.info("Creating relation between " + getFieldValue(rawData, "externalId") + " and " + getFieldValue(o, "externalId"));
+                this.log.info("Creating relation between " + getFieldValue(rawData, EXTERNAL_ID) + " and " + getFieldValue(o, EXTERNAL_ID));
                 this.graphyService.createRelation(rawData, o);
                 this.graphyService.createRelation(o, rawData);
             }
@@ -297,7 +307,7 @@ public class NerService {
             for (Object source : allInsightEntities) {
                 for (Object target : allInsightEntities) {
                     try {
-                        this.log.info("Creating relation between " + getFieldValue(source, "externalId") + " and " + getFieldValue(target, "externalId"));
+                        this.log.info("Creating relation between " + getFieldValue(source, EXTERNAL_ID) + " and " + getFieldValue(target, EXTERNAL_ID));
                         this.graphyService.createRelation(source, target);
                     } catch (Exception e) {
                         this.log.error("Failed to create relation", e.getMessage());
@@ -311,7 +321,7 @@ public class NerService {
                 .map(dto -> (InsightEntity) dto).collect(Collectors.toList());
         List<EntitiesPositionRef> positionRefs = new ArrayList<>();
         for (InsightEntity e : collect) {
-            String externalId = getFieldValue(e, "externalId");
+            String externalId = getFieldValue(e, EXTERNAL_ID);
             String id = getFieldValue(e, "id");
 
             String type = "";
