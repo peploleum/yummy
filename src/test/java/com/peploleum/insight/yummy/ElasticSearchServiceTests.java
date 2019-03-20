@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.Instant;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ElasticSearchServiceTests {
@@ -29,5 +31,10 @@ public class ElasticSearchServiceTests {
         Assert.assertNotNull(esHit);
         Assert.assertNotNull(esHit.getSource().getAdditionalProperties().get("externalId"));
         Assert.assertEquals("biographics", esHit.getType());
+    }
+
+    @Test
+    public void instantTest() {
+        this.log.info(Instant.now().toString());
     }
 }
