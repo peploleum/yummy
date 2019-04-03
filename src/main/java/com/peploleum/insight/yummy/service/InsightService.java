@@ -118,23 +118,37 @@ public class InsightService {
         final HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         final HttpEntity<String> entity = new HttpEntity<>(headers);
-        final ResponseEntity<String> forEntity;
-        try {
-            forEntity = this.restTemplate.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
-            log.info("Received " + forEntity);
-            log.info("Extracting cookie");
-            final List<String> cookies = forEntity.getHeaders().get("Set-Cookie");
-            final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
-            log.info("Extracted cookie: " + actualCookie);
-            return actualCookie;
-        } catch (RestClientException e) {
-            if (e instanceof HttpClientErrorException.Unauthorized) {
-                log.warn("Unauthorized. Need to retrieve session cookie for future requests.");
-                final List<String> cookies = ((HttpClientErrorException.Unauthorized) e).getResponseHeaders().get("Set-Cookie");
+
+        int retries = 3;
+        boolean needretry = true;
+        while (needretry) {
+            try {
+                if (--retries == 0) {
+                    needretry = false;
+                }
+                final ResponseEntity<String> forEntity = this.restTemplate.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
+                log.info("Received " + forEntity);
+                log.info("Extracting cookie");
+                final List<String> cookies = forEntity.getHeaders().get("Set-Cookie");
                 final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
+                log.info("Extracted cookie: " + actualCookie);
                 return actualCookie;
-            } else {
-                log.error("Failed to contact account service.", e);
+            } catch (RestClientException e) {
+                if (e instanceof HttpClientErrorException.Unauthorized) {
+                    log.warn("Unauthorized. Need to retrieve session cookie for future requests.");
+                    final List<String> cookies = ((HttpClientErrorException.Unauthorized) e).getResponseHeaders().get("Set-Cookie");
+                    final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
+                    return actualCookie;
+                } else {
+                    log.error("Failed to contact account service. " + retries + " retries left.", e);
+                    try {
+                        final int wait = 30;
+                        log.error("Retry in " + wait + " seconds", e);
+                        Thread.sleep(wait * 1000);
+                    } catch (InterruptedException e1) {
+                        // useless
+                    }
+                }
             }
         }
         return null;
