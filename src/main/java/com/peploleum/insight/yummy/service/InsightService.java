@@ -1,5 +1,6 @@
 package com.peploleum.insight.yummy.service;
 
+import com.peploleum.insight.yummy.dto.entities.Identifiers;
 import com.peploleum.insight.yummy.dto.entities.insight.Relation;
 import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
@@ -47,11 +48,10 @@ public class InsightService {
     }
 
     @Recover
-    public String recover(org.springframework.web.client.ResourceAccessException e, Object entity) throws IOException {
+    public Identifiers recover(org.springframework.web.client.ResourceAccessException e, Object entity) throws IOException {
         initRestTemplate();
         try {
-            final String s = this.doSend(entity, HttpMethod.POST);
-            return s;
+            return this.doSend(entity, HttpMethod.POST);
         } catch (Exception e1) {
             this.log.error(e1.getMessage(), e1);
             throw new IOException("entity creation failed after all attempts.");
@@ -59,7 +59,7 @@ public class InsightService {
     }
 
     @Recover
-    public String recover(org.springframework.web.client.HttpClientErrorException e, Object entity) throws IOException {
+    public Identifiers recover(org.springframework.web.client.HttpClientErrorException e, Object entity) throws IOException {
         initRestTemplate();
         try {
             return this.doSend(entity, HttpMethod.POST);
@@ -70,17 +70,17 @@ public class InsightService {
     }
 
     @Retryable(maxAttempts = 2, value = {HttpClientErrorException.class, ResourceAccessException.class}, backoff = @Backoff(delay = 30000))
-    public String create(Object entity) {
+    public Identifiers create(Object entity) {
         this.log.debug("Creating Entity");
         return this.doSend(entity, HttpMethod.POST);
     }
 
-    public String update(Object entity) {
+    public Identifiers update(Object entity) {
         this.log.debug("Sending Entity");
         return this.doSend(entity, HttpMethod.PUT);
     }
 
-    private String doSend(final Object dto, final HttpMethod method) throws RestClientException {
+    private Identifiers doSend(final Object dto, final HttpMethod method) throws RestClientException {
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         final ResponseEntity<Object> tResponseEntity;
         try {
@@ -96,7 +96,11 @@ public class InsightService {
             log.debug("Received " + tResponseEntity);
             final LinkedHashMap body = (LinkedHashMap) tResponseEntity.getBody();
             final String id = (String) body.get("id");
-            return id;
+            final String externalId = (String) body.get("externalId");
+            final Identifiers identifiers = new Identifiers();
+            identifiers.setId(id);
+            identifiers.setExternalId(externalId);
+            return identifiers;
         } catch (Exception e) {
             this.log.warn("Failed to send entity");
             this.log.debug(e.getMessage(), e);
@@ -202,7 +206,7 @@ public class InsightService {
         final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
         final ResponseEntity<String> tResponseEntity;
         try {
-            tResponseEntity = rt.exchange(this.urlinsight  + "graph/relation", HttpMethod.POST,
+            tResponseEntity = rt.exchange(this.urlinsight + "graph/relation", HttpMethod.POST,
                     new HttpEntity<>(relation, headers), String.class);
             log.debug("Received " + tResponseEntity.getBody());
             return tResponseEntity.getBody();

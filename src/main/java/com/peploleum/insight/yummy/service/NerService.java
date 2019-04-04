@@ -3,6 +3,7 @@ package com.peploleum.insight.yummy.service;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.peploleum.insight.yummy.dto.entities.Identifiers;
 import com.peploleum.insight.yummy.dto.entities.insight.*;
 import com.peploleum.insight.yummy.dto.source.SimpleRawData;
 import com.peploleum.insight.yummy.dto.source.elasticearch.EsHit;
@@ -167,9 +168,10 @@ public class NerService {
         final RawData rawData = responseHandler.getRawData();
 
         // Create RawData
-        final String rawDataId = this.insightClientService.create(rawData);
-        rawData.setId(rawDataId);
-        log.info("Sent raw data " + rawDataId + " to Insight  ");
+        final Identifiers identifiers = this.insightClientService.create(rawData);
+        rawData.setId(identifiers.getId());
+        rawData.setExternalId(identifiers.getExternalId());
+        log.info("Sent raw data " + identifiers.getId() + " / " + identifiers.getExternalId() + "  to Insight  ");
 
         // Get Extracted entities
         final List<InsightEntity> insightEntities = responseHandler.getInsightEntities();
@@ -249,8 +251,9 @@ public class NerService {
                 }
 
                 // Create in DB
-                final String mongoId = this.insightClientService.create(o);
-                setFieldValue(o, "id", mongoId);
+                final Identifiers objectIdentifiers = this.insightClientService.create(o);
+                setFieldValue(o, "id", objectIdentifiers.getId());
+                setFieldValue(o, EXTERNAL_ID, objectIdentifiers.getExternalId());
 
                 // Create in GraphDB
                 if (useGraph) {
@@ -327,6 +330,7 @@ public class NerService {
         final String positionsToString = mapper.writeValueAsString(positionRefs);
         rawData.setRawDataAnnotations(positionsToString);
         this.insightClientService.update(rawData);
+
 
     }
 
