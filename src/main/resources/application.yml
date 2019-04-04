@@ -6,26 +6,26 @@ spring:
     stream:
       kafka:
         binder:
-          brokers: 10.71.2.66:8092
-          zk-nodes: localhost
+          brokers: 192.168.0.132:8092
+          zk-nodes: 192.168.0.132
       bindings:
         input:
           binder: kafka
-          destination: topicjson
+          destination: topicrss
         output:
           binder: kafka
-          destination: topicjson
+          destination: topicrss
 format: dd/MM/YYYY hh:mm:ss
 fixed-delay: 3000
-urlner: http://localhost:9999/opener
-urlinsight:  http://localhost:8080/api/
+urlner: http://192.168.0.132:9999/opener
+urlinsight:  http://192.168.0.132:8080/api/
 ner:  false
 graph:
-  enabled: true
+  enabled: false
   host: localhost
   port: 8090
 elasticsearch:
-  enabled: true
+  enabled: false
   host: 10.65.34.149
   clustername: insight
   port: 30201

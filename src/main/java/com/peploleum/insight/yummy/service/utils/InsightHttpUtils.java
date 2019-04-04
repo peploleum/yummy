@@ -15,6 +15,9 @@ public class InsightHttpUtils {
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        if (cookies == null || cookies.isEmpty()) {
+            return headers;
+        }
         headers.add("X-XSRF-TOKEN", extractXsrf(cookies));
         for (String cookie : cookies) {
             headers.add("Cookie", cookie);

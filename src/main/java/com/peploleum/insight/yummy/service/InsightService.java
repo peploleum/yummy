@@ -6,10 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,62 +36,46 @@ public class InsightService {
 
     @PostConstruct
     private void onConstruct() {
-        initRestTemplateWithCleanSession();
+        initRestTemplate();
     }
 
-    private void initRestTemplateWithCleanSession() {
-        this.restTemplate = new RestTemplateBuilder().setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(10)).build();
+    private void initRestTemplate() {
+        this.restTemplate = new RestTemplateBuilder().setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(20)).build();
         this.cookies = this.generateCookies();
     }
 
-    public String create(Object entity) throws IOException {
-        this.log.debug("Creating Entity");
-        if (this.cookies == null) {
-            this.log.error("Anthentication failed. Object will not be sent.");
-            throw new IOException("Authentication information not found.");
-        }
-        this.log.debug("Session cookie found");
+    @Recover
+    public String recover(org.springframework.web.client.ResourceAccessException e, Object entity) throws IOException {
+        initRestTemplate();
         try {
-            return this.doSend(entity, HttpMethod.POST);
-        } catch (Exception e) {
-            if (e instanceof HttpClientErrorException.Forbidden) {
-                log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
-                initRestTemplateWithCleanSession();
-                if (this.cookies != null) {
-                    return this.doSend(entity, HttpMethod.POST);
-                } else {
-                    log.error("Could not authenticate.");
-                }
-            } else {
-                throw e;
-            }
+            final String s = this.doSend(entity, HttpMethod.POST);
+            return s;
+        } catch (Exception e1) {
+            this.log.error(e1.getMessage(), e1);
+            throw new IOException("entity creation failed after all attempts.");
         }
-        return null;
     }
 
-    public String update(Object entity) throws IOException {
-        this.log.debug("Sending Entity");
-        if (this.cookies == null) {
-            this.log.error("Anthentication failed. Object will not be sent.");
-            throw new IOException("Authentication information not found.");
-        }
-        this.log.debug("Session cookie found");
+    @Recover
+    public String recover(org.springframework.web.client.HttpClientErrorException e, Object entity) throws IOException {
+        initRestTemplate();
         try {
-            return this.doSend(entity, HttpMethod.PUT);
-        } catch (Exception e) {
-            if (e instanceof HttpClientErrorException.Forbidden) {
-                log.warn("Unauthorized. Cookie expired ? Trying to authenticate again.");
-                initRestTemplateWithCleanSession();
-                if (this.cookies != null) {
-                    return this.doSend(entity, HttpMethod.PUT);
-                } else {
-                    log.error("Could not authenticate.");
-                }
-            } else {
-                throw e;
-            }
+            return this.doSend(entity, HttpMethod.POST);
+        } catch (Exception e1) {
+            this.log.error(e1.getMessage(), e1);
+            throw new IOException("entity creation failed after all attempts.");
         }
-        return null;
+    }
+
+    @Retryable(maxAttempts = 2, value = {HttpClientErrorException.class, ResourceAccessException.class}, backoff = @Backoff(delay = 30000))
+    public String create(Object entity) {
+        this.log.debug("Creating Entity");
+        return this.doSend(entity, HttpMethod.POST);
+    }
+
+    public String update(Object entity) {
+        this.log.debug("Sending Entity");
+        return this.doSend(entity, HttpMethod.PUT);
     }
 
     private String doSend(final Object dto, final HttpMethod method) throws RestClientException {
@@ -119,40 +107,27 @@ public class InsightService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         final HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        int retries = 3;
-        boolean needretry = true;
-        while (needretry) {
-            try {
-                if (--retries == 0) {
-                    needretry = false;
-                }
-                final ResponseEntity<String> forEntity = this.restTemplate.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
-                log.info("Received " + forEntity);
-                log.info("Extracting cookie");
-                final List<String> cookies = forEntity.getHeaders().get("Set-Cookie");
+        try {
+            final ResponseEntity<String> forEntity = this.restTemplate.exchange(this.urlinsight + "account", HttpMethod.GET, entity, String.class);
+            log.info("Received " + forEntity);
+            log.info("Extracting cookie");
+            final List<String> cookies = forEntity.getHeaders().get("Set-Cookie");
+            final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
+            log.info("Extracted cookie: " + actualCookie);
+            return actualCookie;
+        } catch (RestClientException e) {
+            if (e instanceof HttpClientErrorException.Unauthorized) {
+                log.warn("Unauthorized. Need to retrieve session cookie for future requests.");
+                final List<String> cookies = ((HttpClientErrorException.Unauthorized) e).getResponseHeaders().get("Set-Cookie");
                 final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
-                log.info("Extracted cookie: " + actualCookie);
                 return actualCookie;
-            } catch (RestClientException e) {
-                if (e instanceof HttpClientErrorException.Unauthorized) {
-                    log.warn("Unauthorized. Need to retrieve session cookie for future requests.");
-                    final List<String> cookies = ((HttpClientErrorException.Unauthorized) e).getResponseHeaders().get("Set-Cookie");
-                    final String actualCookie = InsightHttpUtils.extractXsrf(cookies);
-                    return actualCookie;
-                } else {
-                    log.error("Failed to contact account service. " + retries + " retries left.", e);
-                    try {
-                        final int wait = 30;
-                        log.error("Retry in " + wait + " seconds", e);
-                        Thread.sleep(wait * 1000);
-                    } catch (InterruptedException e1) {
-                        // useless
-                    }
-                }
+            } else {
+                log.error("Failed to contact account service. ", e);
             }
         }
         return null;
     }
+
 
     private List<String> authent(String accountCookie) {
         final HttpHeaders headers = new HttpHeaders();
