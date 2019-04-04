@@ -21,10 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -68,9 +65,6 @@ public class NerService {
 
     @Value("${elasticsearch.enabled}")
     private boolean useElasticSearch;
-
-    @Autowired
-    private GraphyService graphyService;
 
     @Autowired
     private InsightService insightClientService;
@@ -175,19 +169,6 @@ public class NerService {
         // Create RawData
         final String rawDataId = this.insightClientService.create(rawData);
         rawData.setId(rawDataId);
-        if (useGraph) {
-            try {
-                String graphySourceId = this.graphyService.create(rawData);
-                rawData.setExternalId(graphySourceId);
-                this.insightClientService.update(rawData);
-            } catch (RestClientException e) {
-                this.log.error("Failed to write in Graphy", e.getMessage());
-                throw e;
-            } catch (Exception e) {
-                this.log.error("Failed to update in Insight", e.getMessage());
-                throw e;
-            }
-        }
         log.info("Sent raw data " + rawDataId + " to Insight  ");
 
         // Get Extracted entities
@@ -273,17 +254,10 @@ public class NerService {
 
                 // Create in GraphDB
                 if (useGraph) {
-                    this.log.info("Created Insight Entity: " + o.toString());
-                    final String janusId = this.graphyService.create(o);
-                    setFieldValue(o, EXTERNAL_ID, janusId);
-                    this.log.info("Created Graphy Entity: " + o.toString());
-                    this.insightClientService.update(o);
-                    this.log.info("Updated Insight Entity: " + o.toString());
-
                     // BiDirectionnal
                     this.log.info("Creating relation between " + getFieldValue(rawData, EXTERNAL_ID) + " and " + getFieldValue(o, EXTERNAL_ID));
-                    this.graphyService.createRelation(rawData, o);
-                    this.graphyService.createRelation(o, rawData);
+                    this.insightClientService.createRelation(rawData, o);
+                    this.insightClientService.createRelation(o, rawData);
                 }
             } catch (Exception e) {
                 this.log.error("Failed to write in Graphy", e);
@@ -294,8 +268,8 @@ public class NerService {
             for (Object o : toUpdateEntities) {
                 // BiDirectionnal
                 this.log.info("Creating relation between " + getFieldValue(rawData, EXTERNAL_ID) + " and " + getFieldValue(o, EXTERNAL_ID));
-                this.graphyService.createRelation(rawData, o);
-                this.graphyService.createRelation(o, rawData);
+                this.insightClientService.createRelation(rawData, o);
+                this.insightClientService.createRelation(o, rawData);
             }
         }
 
@@ -310,7 +284,7 @@ public class NerService {
                 for (Object target : allInsightEntities) {
                     try {
                         this.log.info("Creating relation between " + getFieldValue(source, EXTERNAL_ID) + " and " + getFieldValue(target, EXTERNAL_ID));
-                        this.graphyService.createRelation(source, target);
+                        this.insightClientService.createRelation(source, target);
                     } catch (Exception e) {
                         this.log.error("Failed to create relation", e.getMessage());
                     }

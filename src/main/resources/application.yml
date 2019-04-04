@@ -20,10 +20,6 @@ fixed-delay: 3000
 urlner: http://192.168.0.132:9999/opener
 urlinsight:  http://192.168.0.132:8080/api/
 ner:  false
-graph:
-  enabled: false
-  host: localhost
-  port: 8090
 elasticsearch:
   enabled: false
   host: 10.65.34.149

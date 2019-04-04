@@ -1,5 +1,6 @@
 package com.peploleum.insight.yummy.service;
 
+import com.peploleum.insight.yummy.dto.entities.insight.Relation;
 import com.peploleum.insight.yummy.service.utils.InsightHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -168,5 +170,52 @@ public class InsightService {
         this.log.warn("Account cookie received. Anthenticating");
         final List<String> cookies = this.authent(accountCookie);
         return cookies;
+    }
+
+    public void createRelation(Object sourceDTO, Object targetDTO) throws Exception {
+        try {
+            final Object sourceExternalIdValue = extractFieldValue(sourceDTO);
+            final Object targetExternalIdValue = extractFieldValue(targetDTO);
+            this.doSendRelation(sourceExternalIdValue.toString(), targetExternalIdValue.toString(), TypeResolver.resolve(sourceDTO), TypeResolver.resolve(targetDTO));
+        } catch (Exception e) {
+            this.log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    private Object extractFieldValue(Object dto) throws IllegalAccessException {
+        Field sourceExternalIdField = org.springframework.util.ReflectionUtils.findField(dto.getClass(), "externalId");
+        org.springframework.util.ReflectionUtils.makeAccessible(sourceExternalIdField);
+        return sourceExternalIdField.get(dto);
+    }
+
+    private String doSendRelation(String idSource, String idTarget, String sourceType, String targetType) throws RestClientException {
+        this.log.info("Creating relation between " + idSource + "/" + sourceType + " and " + idTarget + "/" + targetType);
+        final Relation relation = new Relation();
+        relation.setIdJanusSource(idSource);
+        relation.setIdJanusCible(idTarget);
+        relation.setName("linked to");
+        relation.setTypeSource(sourceType);
+        relation.setTypeCible(targetType);
+
+        final RestTemplate rt = new RestTemplate();
+        final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
+        final ResponseEntity<String> tResponseEntity;
+        try {
+            tResponseEntity = rt.exchange(this.urlinsight  + "graph/relation", HttpMethod.POST,
+                    new HttpEntity<>(relation, headers), String.class);
+            log.debug("Received " + tResponseEntity.getBody());
+            return tResponseEntity.getBody();
+        } catch (RestClientException e) {
+            this.log.warn("Failed to send entity");
+            this.log.debug(e.getMessage(), e);
+            throw e;
+        }
+    }
+}
+
+class TypeResolver {
+    public static String resolve(Object object) {
+        return object.getClass().getSimpleName();
     }
 }
