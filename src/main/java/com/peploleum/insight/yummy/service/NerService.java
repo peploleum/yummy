@@ -183,7 +183,7 @@ public class NerService {
             } catch (RestClientException e) {
                 this.log.error("Failed to write in Graphy", e.getMessage());
                 throw e;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 this.log.error("Failed to update in Insight", e.getMessage());
                 throw e;
             }
