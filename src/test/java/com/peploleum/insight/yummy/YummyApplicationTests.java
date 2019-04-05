@@ -1,6 +1,7 @@
 package com.peploleum.insight.yummy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.peploleum.insight.yummy.dto.entities.Identifiers;
 import com.peploleum.insight.yummy.dto.entities.insight.Biographics;
 import com.peploleum.insight.yummy.dto.entities.insight.InsightEntity;
 import com.peploleum.insight.yummy.dto.entities.insight.RawData;
@@ -99,14 +100,14 @@ public class YummyApplicationTests {
         final Biographics biographics = new Biographics();
         biographics.setBiographicsFirstname("testFirstName");
         biographics.setBiographicsName("testName");
-        final String idRawData = this.insightClientService.create(rawData);
-        final String idBio = this.insightClientService.create(biographics);
-        Assert.assertNotNull(idRawData);
-        Assert.assertNotNull(idBio);
-        final String newIdRawData = this.insightClientService.create(rawData);
-        final String newIdBiographics = this.insightClientService.create(biographics);
-        Assert.assertNotNull(newIdRawData);
-        Assert.assertNotNull(newIdBiographics);
+        final Identifiers rawDataIds = this.insightClientService.create(rawData);
+        final Identifiers bioIds = this.insightClientService.create(biographics);
+        Assert.assertNotNull(rawDataIds);
+        Assert.assertNotNull(bioIds);
+        final Identifiers rawDataNewIds = this.insightClientService.create(rawData);
+        final Identifiers bioNewIds = this.insightClientService.create(biographics);
+        Assert.assertNotNull(rawDataNewIds);
+        Assert.assertNotNull(bioNewIds);
     }
 
     @Test
