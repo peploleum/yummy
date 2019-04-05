@@ -49,9 +49,8 @@ public class InsightService {
 
     @Recover
     public Identifiers recover(org.springframework.web.client.ResourceAccessException e, Object entity) throws IOException {
-        initRestTemplate();
         try {
-            return this.doSend(entity, HttpMethod.POST);
+            return this.doSend(entity, HttpMethod.POST, true);
         } catch (Exception e1) {
             this.log.error(e1.getMessage(), e1);
             throw new IOException("entity creation failed after all attempts.");
@@ -60,27 +59,29 @@ public class InsightService {
 
     @Recover
     public Identifiers recover(org.springframework.web.client.HttpClientErrorException e, Object entity) throws IOException {
-        initRestTemplate();
         try {
-            return this.doSend(entity, HttpMethod.POST);
+            return this.doSend(entity, HttpMethod.POST, true);
         } catch (Exception e1) {
             this.log.error(e1.getMessage(), e1);
             throw new IOException("entity creation failed after all attempts.");
         }
     }
 
-    @Retryable(maxAttempts = 2, value = {HttpClientErrorException.class, ResourceAccessException.class}, backoff = @Backoff(delay = 30000))
+    @Retryable(maxAttempts = 2, value = {HttpClientErrorException.class, ResourceAccessException.class}, backoff = @Backoff(delay = 5000))
     public Identifiers create(Object entity) {
         this.log.debug("Creating Entity");
-        return this.doSend(entity, HttpMethod.POST);
+        return this.doSend(entity, HttpMethod.POST, false);
     }
 
     public Identifiers update(Object entity) {
         this.log.debug("Sending Entity");
-        return this.doSend(entity, HttpMethod.PUT);
+        return this.doSend(entity, HttpMethod.PUT, false);
     }
 
-    private Identifiers doSend(final Object dto, final HttpMethod method) throws RestClientException {
+    private Identifiers doSend(final Object dto, final HttpMethod method, final boolean needAuth) throws RestClientException {
+        if (needAuth) {
+            initRestTemplate();
+        }
         final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         final ResponseEntity<Object> tResponseEntity;
         try {
@@ -194,6 +195,7 @@ public class InsightService {
     }
 
     private String doSendRelation(String idSource, String idTarget, String sourceType, String targetType) throws RestClientException {
+        final HttpHeaders headers = InsightHttpUtils.getHttpJsonHeader(this.cookies);
         this.log.info("Creating relation between " + idSource + "/" + sourceType + " and " + idTarget + "/" + targetType);
         final Relation relation = new Relation();
         relation.setIdJanusSource(idSource);
@@ -202,16 +204,14 @@ public class InsightService {
         relation.setTypeSource(sourceType);
         relation.setTypeCible(targetType);
 
-        final RestTemplate rt = new RestTemplate();
-        final HttpHeaders headers = InsightHttpUtils.getBasicHeaders();
         final ResponseEntity<String> tResponseEntity;
         try {
-            tResponseEntity = rt.exchange(this.urlinsight + "graph/relation", HttpMethod.POST,
+            tResponseEntity = this.restTemplate.exchange(this.urlinsight + "graph/relation", HttpMethod.POST,
                     new HttpEntity<>(relation, headers), String.class);
             log.debug("Received " + tResponseEntity.getBody());
             return tResponseEntity.getBody();
         } catch (RestClientException e) {
-            this.log.warn("Failed to send entity");
+            this.log.warn("Failed to send relation");
             this.log.debug(e.getMessage(), e);
             throw e;
         }

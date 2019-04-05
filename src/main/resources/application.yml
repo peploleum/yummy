@@ -19,13 +19,13 @@ format: dd/MM/YYYY hh:mm:ss
 fixed-delay: 3000
 urlner: http://192.168.0.132:9999/opener
 urlinsight:  http://192.168.0.132:8080/api/
-ner:  false
+ner:  true
 graph:
   enabled: true
 elasticsearch:
   enabled: false
-  host: 10.65.34.149
+  host: 192.168.0.132
   clustername: insight
-  port: 30201
-  node-port: 30201
+  port: 9200
+  node-port: 9200
   index-name: gazetter

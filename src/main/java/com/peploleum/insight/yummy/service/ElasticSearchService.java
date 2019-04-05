@@ -8,12 +8,14 @@ import com.peploleum.insight.yummy.dto.source.elasticearch.EsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 
 
@@ -44,7 +46,7 @@ public class ElasticSearchService {
     @PostConstruct
     public void setup() {
         this.searchUrl = "http://" + this.elasticsearchHost + ":" + this.elasticsearchPort;
-        this.rt = new RestTemplate();
+        this.rt = new RestTemplateBuilder().setConnectTimeout(Duration.ofSeconds(30)).setReadTimeout(Duration.ofSeconds(20)).build();
         this.headers = new HttpHeaders();
         this.headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         this.headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
