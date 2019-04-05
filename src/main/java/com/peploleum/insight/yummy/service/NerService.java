@@ -326,10 +326,12 @@ public class NerService {
 
             e.getTextPositionInfo().stream().forEach(pos -> positionRefs.add(new EntitiesPositionRef(id, externalId, pos, entityWord, entityType)));
         }
-        final ObjectMapper mapper = new ObjectMapper();
-        final String positionsToString = mapper.writeValueAsString(positionRefs);
-        rawData.setRawDataAnnotations(positionsToString);
-        this.insightClientService.update(rawData);
+        if (collect != null && !collect.isEmpty()) {
+            final ObjectMapper mapper = new ObjectMapper();
+            final String positionsToString = mapper.writeValueAsString(positionRefs);
+            rawData.setRawDataAnnotations(positionsToString);
+            this.insightClientService.update(rawData);
+        }
 
 
     }
