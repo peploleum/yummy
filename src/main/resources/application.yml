@@ -23,7 +23,7 @@ ner:  true
 graph:
   enabled: true
 elasticsearch:
-  enabled: false
+  enabled: true
   host: 192.168.0.132
   clustername: insight
   port: 9200
