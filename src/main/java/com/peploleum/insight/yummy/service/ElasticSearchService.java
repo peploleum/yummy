@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peploleum.insight.yummy.dto.source.elasticearch.EsMatchQuery;
 import com.peploleum.insight.yummy.dto.source.elasticearch.EsResponse;
+import com.peploleum.insight.yummy.dto.source.elasticearch.EsTermExactQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,10 +62,11 @@ public class ElasticSearchService {
      */
     public EsResponse submitElasticSearchGazetteerRequest(final String locationName) throws IOException {
         this.log.debug("submitting request for " + locationName);
-        final EsMatchQuery query = new EsMatchQuery("name", locationName);
+       // final EsMatchQuery query = new EsMatchQuery("name", locationName);
+        final EsTermExactQuery query=new EsTermExactQuery("name",locationName);
         final HttpEntity<String> entity = new HttpEntity<>(query.getContent(), headers);
-        this.log.debug("using endpoint " + this.searchUrl);
-        this.log.debug("sending  " + query.getContent());
+        this.log.info("using endpoint " + this.searchUrl);
+        this.log.info("sending  " + query.getContent());
         final ResponseEntity<String> tResponseEntity = rt.exchange(this.searchUrl + "/" + this.elasticsearchGazetteerIndex + "/_search", HttpMethod.POST, entity, String.class);
         log.debug("Received raw " + tResponseEntity.getBody());
         final EsResponse esObjectResponse = mapperObj.readValue(tResponseEntity.getBody(), EsResponse.class);

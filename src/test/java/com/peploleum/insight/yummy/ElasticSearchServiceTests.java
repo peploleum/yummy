@@ -34,6 +34,21 @@ public class ElasticSearchServiceTests {
     }
 
     @Test
+    public void getLocation()
+    {
+        this.log.info("search location");
+        try {
+            final EsResponse result = this.elasticSearchService.submitElasticSearchGazetteerRequest("Paris");
+            this.log.info(result.toString());
+        }catch (Exception e)
+        {
+            this.log.info(e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
     public void instantTest() {
         this.log.info(Instant.now().toString());
     }
