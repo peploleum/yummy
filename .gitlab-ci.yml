@@ -1,51 +1,59 @@
-image: docker:latest
-services:
-  - docker:dind
-# needs CI_BUILD_USER: registry user
+
+# needs CI_BUILD_PUBLIC_USER: registry user, CI_BUILD_PUBLIC_TOKEN: registry password for dockerhub
+# needs CI_BUILD_PRIVATE_USER: registry user, CI_BUILD_PRIVATE_TOKEN: registry password for internal registry
 variables:
   DOCKER_DRIVER: overlay2
   APP_NAME: yummy
-  CI_DOCKER_REGISTRY: registry.hub.docker.com
+  CI_DOCKER_PRIVATE_REGISTRY: 192.168.0.52:9082
+  CI_DOCKER_PUSH_REGISTRY: 192.168.0.52:9080
   CI_DOCKER_IMAGE: yummy
-  CONTAINER_IMAGE: $CI_DOCKER_REGISTRY/$CI_BUILD_USER/$CI_DOCKER_IMAGE
-  KUBECTL_VERSION: v1.13.3
+  PRIVATE_CONTAINER_IMAGE: $CI_DOCKER_PUSH_REGISTRY/$CI_DOCKER_IMAGE
+  PUBLIC_CONTAINER_IMAGE: $CI_BUILD_PUBLIC_USER/$CI_DOCKER_IMAGE
 
 stages:
-  - build-jar
+  - build
   - build-docker
-  - deploy-k8s
+  - deploy
 
 maven-build:
-  image: maven:3-jdk-8
+  image: $CI_DOCKER_PRIVATE_REGISTRY/java-node:jdk8-alpine3.9
   stage: build-jar
-  script: "mvn clean package -DskipTests" 
+  script: "mvn clean package -DskipTests"
   artifacts:
     paths:
       - target/*.jar
       - target/*.sh
       - target/Dockerfile
 
-docker-build:
-  stage: build-docker 
+docker-build-private:
+  stage: build-docker
+  services:
+    - name: $CI_DOCKER_PRIVATE_REGISTRY/docker:dind
   script:
-    - docker login -u $CI_BUILD_USER -p $CI_BUILD_TOKEN $CI_DOCKER_REGISTRY
-    - docker pull $CONTAINER_IMAGE:latest || true
+    - docker login -u $CI_BUILD_PRIVATE_USER -p $CI_BUILD_PRIVATE_TOKEN $CI_DOCKER_PUSH_REGISTRY
     - cd target
-    - docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_COMMIT_SHORT_SHA --tag $CONTAINER_IMAGE:latest .
-    - docker push $CONTAINER_IMAGE:$CI_COMMIT_SHORT_SHA
-    - docker push $CONTAINER_IMAGE:latest
+    - docker build --tag $PRIVATE_CONTAINER_IMAGE:latest .
+    - docker push $PRIVATE_CONTAINER_IMAGE:latest
+
+docker-build-public:
+  stage: build-docker
+  services:
+    - name: $CI_DOCKER_PRIVATE_REGISTRY/docker:dind
+  script:
+    - docker login -u $CI_BUILD_PUBLIC_USER -p $CI_BUILD_PUBLIC_TOKEN 
+    - cd target
+    - docker build --tag $PUBLIC_CONTAINER_IMAGE:latest .
+    - docker push $PUBLIC_CONTAINER_IMAGE:latest
+  allow_failure: true
+
 
 kubernetes_deploy:
-  stage: deploy-k8s
-  image: alpine
+  stage: deploy
+  image: $CI_DOCKER_PRIVATE_REGISTRY/artemis-kubectl:1.13
   script:
-    - apk add --no-cache curl
-    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl
-    - chmod +x ./kubectl
-    - mv ./kubectl /usr/local/bin/kubectl
     - kubectl config set-cluster $KUBE_CLUSTER --server=$KUBE_URL --insecure-skip-tls-verify
     - kubectl config set-context $KUBE_CONTEXT --cluster=$KUBE_CLUSTER
     - kubectl config set-credentials $KUBE_USER --token=$KUBE_TOKEN
     - kubectl config set-context $KUBE_CONTEXT --user=$KUBE_USER
     - kubectl config use-context $KUBE_CONTEXT
-    - kubectl set image deployment/yummy yummy-app=$CI_BUILD_USER/$CI_DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA --namespace=insight
+    - kubectl set image deployment/yummy yummy-app=$CI_DOCKER_PRIVATE_REGISTRY/$CI_DOCKER_IMAGE:latest --namespace=insight
