@@ -17,7 +17,7 @@ stages:
 
 maven-build:
   image: $CI_DOCKER_PRIVATE_REGISTRY/java-node:jdk8-alpine3.9
-  stage: build-jar
+  stage: build
   script: "mvn clean package -DskipTests"
   artifacts:
     paths:
